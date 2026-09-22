@@ -1,0 +1,35 @@
+{
+  "name": "superhost-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS=--use-env-proxy next dev",
+    "build": "next build",
+    "start": "cross-env NODE_OPTIONS=--use-env-proxy next start",
+    "lint": "eslint",
+    "db:check": "cross-env NODE_OPTIONS=--use-env-proxy node --env-file=.env.local scripts/check-db.mjs"
+  },
+  "dependencies": {
+    "@auth/drizzle-adapter": "^1.11.3",
+    "@neondatabase/serverless": "^1.1.0",
+    "@upstash/qstash": "^2.11.3",
+    "drizzle-orm": "^0.45.3",
+    "next": "16.3.6",
+    "next-auth": "^5.0.0-beta.32",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "resend": "^6.28.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
+    "drizzle-kit": "^0.31.11",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

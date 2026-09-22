@@ -43,14 +43,14 @@ Una herramienta que estandariza y agiliza todo lo que ocurre alrededor de la lle
 
 ## Implementation Decisions
 
-- **Arquitectura**: sin decidir todavía (greenfield). Esta spec es agnóstica de stack; la elección de arquitectura (web app full-stack vs. backend API + frontend separado) queda como decisión pendiente antes de implementar.
+- **Arquitectura**: monolito modular full-stack en Next.js, PostgreSQL alojado en Neon con Auth.js para el login del host (accesible desde cualquier PC/ubicación sin infraestructura propia), disparo de mensajes/avisos mediante Upstash QStash (cron cada 5 min con reintentos garantizados). Detalle completo, diagramas C4 y alternativas consideradas en `ARCHITECTURE.md` y `docs/adr/0001` a `0005`.
 - **Alcance de integración con Airbnb**: la primera iteración no asume integración automática con la API/calendario de Airbnb (no hay garantía de acceso). Las reservas se pueden dar de alta manualmente (historia 15); la integración automática queda como mejora futura.
 - **Módulos previstos** (a nivel de dominio, no de archivos):
   - Gestión de Reservas (reservation): datos de huésped, propiedad, fechas, estado.
   - Mensajería (messaging): plantillas, variables, programación y envío de mensajes.
   - Checklist de preparación (housekeeping): definición de tareas por propiedad, estado por reserva.
   - Propiedades (property): datos maestros usados por mensajería y checklist.
-- **Seam de testing**: pendiente de confirmar junto con la arquitectura. Recomendación: exponer un único seam de dominio (ej. capa de "casos de uso"/servicios de aplicación) que orqueste reservation, messaging y housekeeping, de forma que los tests puedan ejercitar el comportamiento completo (crear reserva → dispara checklist → dispara mensajes) sin acoplarse a la UI ni a la infraestructura (BD, proveedor de email/SMS).
+- **Seam de testing**: la capa de aplicación (casos de uso) es el único seam. Orquesta reservation, messaging y housekeeping; los tests ejercitan el comportamiento completo (crear reserva → dispara checklist → dispara mensajes) a través de ella, sin acoplarse a la UI ni a la infraestructura (BD, proveedor de email/SMS). Ver diagrama C4 Nivel 3 en `ARCHITECTURE.md`.
 
 ## Testing Decisions
 
@@ -69,4 +69,3 @@ Una herramienta que estandariza y agiliza todo lo que ocurre alrededor de la lle
 ## Further Notes
 
 - El valor central no es "automatizar por automatizar", sino compensar con sistema y consistencia la falta de historial/reputación de un host nuevo, sosteniendo las métricas que determinan el estatus Superhost (tasa de respuesta, valoración, cero incidencias).
-- Antes de implementar, quedan dos decisiones abiertas señaladas en este documento: (1) arquitectura/stack del MVP, y (2) seam de testing concreto una vez elegida la arquitectura.
