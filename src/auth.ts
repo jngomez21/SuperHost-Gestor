@@ -22,6 +22,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       from: process.env.AUTH_RESEND_FROM,
     }),
   ],
+  pages: {
+    signIn: "/login",
+    verifyRequest: "/login/revisa",
+    error: "/login/error",
+  },
   callbacks: {
     async signIn({ user }) {
       return user.email === process.env.HOST_EMAIL;
