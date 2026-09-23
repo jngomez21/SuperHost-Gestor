@@ -26,6 +26,27 @@ export function formatDate(isoDate: string): string {
   return Number.isNaN(date.getTime()) ? isoDate : dateFormat.format(date);
 }
 
+const longDateFormat = new Intl.DateTimeFormat("es-CO", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  timeZone: "UTC",
+});
+
+export function formatLongDate(isoDate: string): string {
+  const text = longDateFormat.format(new Date(`${isoDate}T00:00:00Z`)).replace(",", "");
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+export function dayLabel(isoDate: string, today: string): string {
+  if (isoDate === today) return "Hoy";
+  const tomorrow = new Date(`${today}T00:00:00Z`);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  if (isoDate === tomorrow.toISOString().slice(0, 10)) return "Mañana";
+  const text = formatDate(isoDate);
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 export function formatDateTime(date: Date): string {
   return dateTimeFormat.format(date);
 }

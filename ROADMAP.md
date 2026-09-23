@@ -20,7 +20,9 @@ Sin historias de usuario propias. Objetivo: probar que cada pieza externa de las
 
 **Hecho cuando:** los 4 proveedores externos (Neon, Auth.js/Resend, QStash, Resend) están probados de forma aislada en producción. Cero valor para el host todavía, cero incertidumbre técnica de aquí en adelante.
 
-## Fase 1 — Núcleo: Propiedades y Reservas
+## Fase 1 — Núcleo: Propiedades y Reservas ✅ Hecha
+
+Cambios respecto al plan: se añadió `/reservas` (libro de huéspedes con historial), necesario para volver a las notas de estancias pasadas; el estado del sistema pasó a `/estado`; y el panel quedó como casillero de llaves por piso más una agenda de 7 días. Los casos de uso se verificaron contra la BD a mano; automatizar esos tests requiere una rama de Neon para pruebas.
 
 Historias 14, 15, 16, 17, 18. Módulo del que dependen `housekeeping` y `messaging`. Se elige primero porque nada más puede construirse sin él.
 

@@ -1069,3 +1069,107 @@ body {
 .button-danger:not(.button-quiet):hover {
   background: #a3486b;
 }
+
+/* ---------- Tablero de llegadas ---------- */
+
+.board-hint {
+  margin-top: 0.4rem;
+  color: rgb(243 245 242 / 0.7);
+  font-size: 0.95rem;
+}
+
+.tag-out {
+  display: block;
+  height: auto;
+  min-height: 13rem;
+  padding: 3.4rem 1.25rem 1.5rem;
+  color: var(--paper);
+  text-decoration: none;
+  text-align: center;
+  opacity: 1;
+}
+
+.tag-out .slot-name,
+.tag-out .slot-detail {
+  display: block;
+}
+
+.tag-out:hover,
+.tag-out:focus-visible {
+  background: rgb(179 134 47 / 0.12);
+}
+
+.slot-turnover {
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--brass);
+  color: var(--brass-light);
+  font-weight: 650;
+}
+
+.stamp-arrival { color: #3a2808; }
+
+.agenda {
+  margin-top: 3rem;
+  max-width: 46rem;
+}
+
+.agenda-done .ledger-guest,
+.agenda-done .agenda-time {
+  opacity: 0.6;
+}
+
+.agenda-day {
+  margin-top: 1.75rem;
+}
+
+.agenda-date {
+  font-size: 1.1rem;
+  font-weight: 750;
+}
+
+.agenda-day .ledger-list {
+  margin-top: 0.6rem;
+}
+
+.agenda-row {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  gap: 0.35rem 1rem;
+  align-items: center;
+  padding: 0.85rem 0.5rem;
+  border-bottom: 2px solid var(--line);
+  color: inherit;
+  text-decoration: none;
+}
+
+.agenda-row .badge {
+  justify-self: start;
+}
+
+@media (min-width: 44rem) {
+  .agenda-row { grid-template-columns: 5rem minmax(0, 1fr) auto; }
+}
+
+.agenda-row:hover {
+  background: var(--line);
+}
+
+.agenda-time {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 43.99rem) {
+  .agenda-time { grid-column: 2; }
+}
+
+.panel-foot {
+  margin-top: 4rem;
+  padding-top: 1.25rem;
+  border-top: 2px solid var(--line);
+}
+
+.back-link-plain {
+  color: var(--muted);
+  font-weight: 650;
+}

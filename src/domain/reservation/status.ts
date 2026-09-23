@@ -11,6 +11,16 @@ export function localInstant(date: string, time: string): Date {
   return new Date(`${date}T${time.slice(0, 5)}:00${COLOMBIA_OFFSET}`);
 }
 
+export function todayInColombia(now: Date): string {
+  return new Date(now.getTime() - 5 * 3_600_000).toISOString().slice(0, 10);
+}
+
+export function addDays(isoDate: string, days: number): string {
+  const date = new Date(`${isoDate}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
 export function nights(checkIn: string, checkOut: string): number {
   return Math.round((Date.parse(`${checkOut}T00:00:00Z`) - Date.parse(`${checkIn}T00:00:00Z`)) / 86_400_000);
 }
