@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { check, date, integer, pgTable, text, time, timestamp, uuid } from "drizzle-orm/pg-core";
+import { check, date, integer, pgTable, primaryKey, text, time, timestamp, uuid } from "drizzle-orm/pg-core";
 import { usersTable } from "./auth-schema";
 
 export const propertyTable = pgTable("property", {
@@ -49,3 +49,27 @@ export const reservationNoteTable = pgTable("reservation_note", {
   body: text("body").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const propertyTaskTable = pgTable("property_task", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  propertyId: uuid("property_id")
+    .notNull()
+    .references(() => propertyTable.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),
+  position: integer("position").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const preparationCheckTable = pgTable(
+  "preparation_check",
+  {
+    reservationId: uuid("reservation_id")
+      .notNull()
+      .references(() => reservationTable.id, { onDelete: "cascade" }),
+    taskId: uuid("task_id")
+      .notNull()
+      .references(() => propertyTaskTable.id, { onDelete: "cascade" }),
+    doneAt: timestamp("done_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.reservationId, t.taskId] })]
+);

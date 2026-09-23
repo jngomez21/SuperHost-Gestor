@@ -57,10 +57,25 @@ Historias 14, 15, 16, 17, 18. Módulo del que dependen `housekeeping` y `messagi
 
 Historias 9, 10, 11, 12. Depende solo de la Fase 1. Va antes que mensajería porque es la pieza más simple de las dos que faltan (CRUD + estado, sin proveedores externos ni disparo por tiempo) — valida que el modelo de reserva aguanta antes de meter la complejidad de QStash/Resend.
 
-- Checklist estándar de tareas por propiedad.
-- Marcar tareas completadas por reserva.
-- Vista de reservas con preparación pendiente.
-- Personalización de la checklist por propiedad.
+### Decisiones
+
+- **Lista por piso**, que nace de una lista estándar al crear el piso y se edita por piso (añadir, renombrar, quitar). Lista estándar: cambiar sábanas, toallas limpias, limpiar baño, limpiar cocina y nevera, sacar la basura, reponer papel/jabón/café, revisar que el wifi funciona, dejar la llave lista.
+- **La preparación pertenece a la llegada** (se prepara el piso *para* un huésped), no al piso: cada reserva tiene sus propias tareas marcadas.
+- **"Listo" se deriva**: una llegada está lista cuando todas las tareas actuales de su piso están marcadas. Añadir una tarea deja pendientes las llegadas afectadas.
+- **Marca el host desde el móvil**: casillas grandes que guardan al tocarlas. Acceso para personal de limpieza fuera de alcance.
+- **Sin revisión de salida** por ahora: lo que se encuentre al salir va a la bitácora de la reserva.
+
+### Tareas
+
+| # | Tarea | Historias |
+|---|---|---|
+| 2.1 | Esquema: tareas del piso y tareas marcadas por reserva, con migración | 9, 10, 12 |
+| 2.2 | Dominio: lista estándar, progreso y "listo" derivados, con tests | 9, 11 |
+| 2.3 | Casos de uso: editar tareas del piso; marcar/desmarcar por reserva | 10, 12 |
+| 2.4 | Pantalla: tareas del piso, dentro de la edición del piso | 12 |
+| 2.5 | Pantalla: preparar una llegada, pensada para móvil | 10 |
+| 2.6 | Panel: progreso en casillero y agenda, sección "Por preparar" | 11 |
+| 2.7 | Pasada de móvil y modo claro sobre todas las pantallas | — |
 
 **Hecho cuando:** el host tiene una checklist reutilizable y ve de un vistazo qué pisos están listos para la próxima llegada.
 
