@@ -85,13 +85,33 @@ Historias 9, 10, 11, 12. Depende solo de la Fase 1. Va antes que mensajería por
 
 Historias 1-8 y 19. La pieza que protege directamente las métricas de Superhost (tasa de respuesta). Es la más compleja: plantillas + variables + integración con QStash y Resend — se deja para después de validar Fases 1-2 con el modelo de reserva ya probado.
 
-- Plantillas reutilizables con variables (nombre, fechas, código de acceso).
-- Disparo automático de mensajes de check-in/check-out según tiempos configurables.
-- Edición/cancelación de mensajes programados antes del envío.
-- Historial de mensajes por reserva.
-- Aviso al host si un mensaje de huésped lleva demasiado tiempo sin respuesta.
+### Decisiones
 
-**Hecho cuando:** una reserva nueva dispara sola sus mensajes de check-in/check-out sin que el host escriba nada a mano.
+- **Canal: copiar y pegar en Airbnb** (ADR-006). El gestor no escribe al huésped: cuando toca un mensaje, avisa al host (en el panel y con un email a su propia dirección, que Resend permite sin dominio propio) con el texto ya relleno. El host lo pega en el chat de Airbnb y lo marca como enviado. La conversación sigue en Airbnb, donde se mide la tasa de respuesta. El email del huésped pasa a ser opcional.
+- **Plantillas por host**, no por piso: las diferencias entre pisos las cubren las variables (`{wifi}`, `{como_entrar}`…). Hay cuatro estándar, que el host crea con un botón y luego edita: bienvenida (al registrar la reserva), instrucciones de llegada (el día antes, 10:00), recordatorio de salida (el día antes de salir, 19:00) y despedida con petición de reseña (el día de salida, 14:00).
+- **Cuándo se envía: día + hora** respecto a la llegada o la salida ("el día antes a las 10:00"), en hora de Colombia, para que nunca caiga de madrugada. La bienvenida toca en cuanto se registra la reserva.
+- **Los mensajes se programan al registrar la reserva**, una fila por plantilla con su hora de envío. Cambiar el horario de una plantilla o añadir una nueva afecta solo a las reservas nuevas; así una plantilla nueva no llena de pendientes las reservas pasadas.
+- **El texto se rellena al mostrarlo**, con los datos actuales del piso y de la plantilla, salvo que el host lo haya editado para esa reserva. Al marcarlo enviado se guarda el texto exacto: el historial muestra lo que se envió de verdad.
+- **Estado derivado**, como el de la reserva: cancelado → enviado → por enviar (ya pasó su hora) → programado. Cancelar la reserva deja sus mensajes pendientes fuera sin tocarlos.
+- **Variable sin dato** (por ejemplo, wifi vacío): se muestra como `[falta: clave del wifi]` para que el host lo vea antes de pegar.
+- **Historia 4, reformulada**: el gestor no ve la bandeja de Airbnb. En su lugar, si un mensaje lleva 3 horas por enviar, el siguiente aviso al host lo recuerda, una sola vez.
+- **Despachador**: QStash llama cada 5 min a `/api/cron/dispatch` (firmado); los 5 min son la frecuencia de la revisión, no de los emails. Reúne lo que acaba de pasar a "por enviar" y lo que sigue sin enviar tras 3 h y, solo si hay algo, manda un email-resumen al host. Como mucho es un email por mensaje, y los que coinciden a la misma hora van juntos. Cada mensaje se marca como avisado antes de mandar el email y se desmarca si el envío falla, para que el reintento de QStash lo repita sin avisar dos veces.
+
+### Tareas
+
+| # | Tarea | Historias |
+|---|---|---|
+| 3.1 | Esquema: plantillas del host y mensajes por reserva, con migración; email del huésped opcional | 2, 5, 8 |
+| 3.2 | Dominio: variables y relleno, hora de envío y estado del mensaje, con tests | 3, 6, 7, 19 |
+| 3.3 | Casos de uso: plantillas (estándar, editar, quitar); programar al registrar la reserva; editar, cancelar y marcar enviado | 1, 2, 8 |
+| 3.4 | Pantalla: plantillas con horario y vista previa | 2, 3, 19 |
+| 3.5 | Ficha de reserva: mensajes con copiar, marcar enviado, editar y cancelar; historial | 5, 8 |
+| 3.6 | Panel: sección "Por enviar" | 1, 6, 7 |
+| 3.7 | Despachador: endpoint de QStash cada 5 min y email-resumen al host | 4, 6, 7 |
+
+Cada pantalla se revisa en móvil y en modo claro al construirla, sin pasada aparte como la 2.7.
+
+**Hecho cuando:** una reserva nueva programa sola sus mensajes y, cuando toca cada uno, el host recibe el aviso con el texto listo para pegar en Airbnb, sin redactar nada a mano.
 
 ## Fase 4 — Cierre de bucles y validación real
 

@@ -11,12 +11,14 @@ flowchart TB
 
     System[Gestor de Check-in/Check-out]
 
-    NotifProvider[[Proveedor de notificaciones<br/>email/SMS]]
-    Airbnb[[Airbnb<br/>fuera de alcance MVP]]
+    NotifProvider[[Proveedor de email<br/>Resend]]
+    Airbnb[[Chat de Airbnb]]
 
     Host -->|gestiona reservas, propiedades,<br/>plantillas y checklist| System
-    System -->|envía mensajes programados| NotifProvider
-    NotifProvider -->|entrega el mensaje| Guest
+    System -->|avisa de los mensajes que tocan,<br/>con el texto listo| NotifProvider
+    NotifProvider -->|email al host| Host
+    Host -->|pega el mensaje| Airbnb
+    Airbnb -->|entrega el mensaje| Guest
     System -.->|integración futura,<br/>fuera de alcance| Airbnb
 ```
 
@@ -34,15 +36,17 @@ flowchart TB
     DB[(PostgreSQL en Neon<br/>reservas, propiedades,<br/>plantillas, checklist)]
     Scheduler[[Upstash QStash<br/>invoca cada 5 min con reintentos]]
     Auth[[Auth.js<br/>login del host]]
-    NotifProvider[[Proveedor de email<br/>ej. Resend]]
+    NotifProvider[[Resend<br/>email al host: login y avisos]]
 
     Host -->|HTTPS, desde cualquier PC/ubicación| UI
     UI --> API
     API --> Auth
     API --> DB
     Scheduler -->|invoca periódicamente| API
-    API -->|envía| NotifProvider
+    API -->|avisa al host| NotifProvider
 ```
+
+Los mensajes al huésped no salen del sistema: el host los pega en el chat de Airbnb (ADR-006).
 
 Un único desplegable. Nada de microservicios ni colas propias: con un host y reservas de bajo volumen, el coste de coordinación distribuida no se justifica (ADR-001). La base de datos y el disparo de tareas son servicios gestionados externos (Neon, QStash) — no infraestructura que haya que operar (ver ADR-004 y ADR-005), y accesibles desde cualquier ubicación sin configuración adicional.
 
@@ -95,7 +99,7 @@ src/
     housekeeping/
     property/
   application/        # casos de uso, el seam único
-  infrastructure/      # DB (Prisma), proveedor de notificaciones, cron
+  infrastructure/      # DB (Drizzle), proveedor de notificaciones, cron
   ui/                   # panel del host
 ```
 
@@ -109,6 +113,7 @@ Ver `docs/adr/`:
 - [ADR-003](docs/adr/0003-postgresql.md) — PostgreSQL vs. NoSQL
 - [ADR-004](docs/adr/0004-disparo-mensajes-cron.md) — Upstash QStash vs. alternativas de cron para disparos programados
 - [ADR-005](docs/adr/0005-proveedor-hosting-datos.md) — Neon+Auth.js vs. Supabase vs. PocketBase autoalojado
+- [ADR-006](docs/adr/0006-canal-de-mensajes.md) — Copiar y pegar en Airbnb vs. email directo al huésped
 
 ## Riesgos y límites conocidos
 
