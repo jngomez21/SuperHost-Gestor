@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { sql } from "drizzle-orm";
 import { requireHost } from "@/app/_lib/host";
 import { db } from "@/infrastructure/db";
@@ -15,8 +16,8 @@ async function checkDatabase() {
 const PHASES = [
   { name: "Cimientos", state: "Hecho", status: "done" },
   { name: "Pisos y reservas", state: "Hecho", status: "done" },
-  { name: "Checklist de limpieza", state: "Lo siguiente", status: "next" },
-  { name: "Mensajes automáticos", state: "Pendiente", status: "" },
+  { name: "Checklist de limpieza", state: "Hecho", status: "done" },
+  { name: "Mensajes automáticos", state: "En curso", status: "next" },
   { name: "Avisos cruzados", state: "Pendiente", status: "" },
 ];
 
@@ -45,7 +46,7 @@ export default async function StatusPage() {
       name: "Correo",
       ok: Boolean(process.env.RESEND_API_KEY),
       stamp: process.env.RESEND_API_KEY ? "Listo" : "Sin configurar",
-      detail: "Envía tus enlaces de acceso y, pronto, los mensajes a huéspedes",
+      detail: "Envía tus enlaces de acceso y, pronto, los avisos de mensajes por enviar",
     },
     {
       name: "Recordatorios",
@@ -56,41 +57,35 @@ export default async function StatusPage() {
   ];
 
   return (
-    <main className="panel">
-      <header className="panel-head">
-        <div>
-          <h1 className="panel-title">Estado del sistema</h1>
-          <p className="panel-lead">
-            Las piezas de las que depende el gestor, comprobadas ahora mismo, y lo que
-            falta por construir.
-          </p>
-        </div>
-      </header>
+    <main className="page">
+      <p><Link href="/panel" className="back-link">Panel</Link></p>
+      <h1 className="page-title">Estado del <span className="boxed">sistema</span></h1>
+      <p className="page-lead">
+        Las piezas de las que depende el gestor, comprobadas ahora mismo, y lo que falta por construir.
+      </p>
 
-      <section className="board" aria-labelledby="board-title">
+      <section className="section" aria-labelledby="board-title">
         <h2 id="board-title" className="section-title">Lo que ya funciona</h2>
-        <ul className="board-rail">
+        <ul className="keyboard">
           {keys.map((key) => (
-            <li key={key.name} className="slot">
-              <div className="slot-hook" aria-hidden="true" />
-              <div className="tag">
-                <p className="slot-name">{key.name}</p>
-                <span className={`stamp ${key.ok ? "stamp-ok" : "stamp-bad"}`}>{key.stamp}</span>
-                <p className="slot-detail">{key.detail}</p>
+            <li key={key.name}>
+              <div className={`keycap${key.ok ? "" : " keycap-arrival"}`}>
+                <span className="keycap-name">{key.name}</span>
+                <span className={`chip ${key.ok ? "chip-free" : "chip-cancelled"}`}>{key.stamp}</span>
+                <span className="keycap-detail">{key.detail}</span>
               </div>
             </li>
           ))}
         </ul>
       </section>
 
-      <section className="path" aria-labelledby="path-title">
-        <h2 id="path-title" className="section-title">Lo que viene</h2>
-        <ol className="path-list">
+      <section className="section" aria-labelledby="path-title">
+        <h2 id="path-title" className="section-title">Por fases</h2>
+        <ol className="roadmap">
           {PHASES.map((phase, i) => (
-            <li key={phase.name} className={`step ${phase.status ? `step-${phase.status}` : ""}`}>
-              <span className="step-number">{i}</span>
-              <span className="step-name">{phase.name}</span>
-              <span className="step-state">{phase.state}</span>
+            <li key={phase.name} className={phase.status ? `phase-${phase.status}` : undefined}>
+              <p className="phase-name">Fase {i}: {phase.name}</p>
+              <p className="phase-state">{phase.state}</p>
             </li>
           ))}
         </ol>

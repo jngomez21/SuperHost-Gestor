@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useOptimistic, useTransition } from "react";
+import { useEffect, useOptimistic, useState, useTransition } from "react";
 import { toggleTaskAction } from "../../actions";
 
 type Task = { id: string; label: string; doneAt: string | null };
@@ -37,7 +37,11 @@ export function PrepList({ reservationId, guestFirstName, arrival, tasks, readOn
   const total = optimistic.length;
   const ready = total > 0 && done === total;
 
+  // Solo la casilla que acaba de marcar el host celebra; las que ya venían marcadas no.
+  const [justChecked, setJustChecked] = useState<string | null>(null);
+
   function toggle(id: string, value: boolean) {
+    setJustChecked(value ? id : null);
     startTransition(async () => {
       setOptimistic({ id, done: value });
       await toggleTaskAction(reservationId, id, value);
@@ -66,7 +70,7 @@ export function PrepList({ reservationId, guestFirstName, arrival, tasks, readOn
           <ul className="prep-list">
             {optimistic.map((task) => (
               <li key={task.id}>
-                <label className={`prep-row${task.doneAt ? " prep-row-done" : ""}`}>
+                <label className={`prep-row${task.doneAt ? " prep-row-done" : ""}${task.id === justChecked ? " prep-row-pop" : ""}`}>
                   <input
                     type="checkbox"
                     className="prep-input"

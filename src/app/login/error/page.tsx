@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { HangingTag } from "@/app/_components/key-tag";
+import { Entry } from "@/app/_components/entry";
 
 const MESSAGES: Record<string, { title: string; text: string }> = {
   Verification: {
@@ -22,17 +22,8 @@ export default async function AuthErrorPage({ searchParams }: PageProps<"/login/
   const message = MESSAGES[String(error)] ?? FALLBACK;
 
   return (
-    <main className="entry">
-      <div>
-        <h1 className="entry-title">{message.title}</h1>
-        <p className="entry-lead">{message.text}</p>
-      </div>
-
-      <HangingTag number="Nº ?" caption="Llave sin validar">
-        <div className="tag-form">
-          <Link className="button" href="/login">Pedir un enlace nuevo</Link>
-        </div>
-      </HangingTag>
-    </main>
+    <Entry glyph="!" title={message.title} lead={message.text}>
+      <Link className="button button-skew" href="/login">Pedir un enlace nuevo</Link>
+    </Entry>
   );
 }

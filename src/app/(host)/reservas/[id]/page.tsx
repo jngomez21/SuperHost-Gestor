@@ -19,18 +19,18 @@ export default async function ReservationPage({ params }: PageProps<"/reservas/[
   const cancellable = status === "upcoming" || status === "in_house";
 
   return (
-    <main className="panel">
+    <main className="page">
       <p><Link href="/reservas" className="back-link">Libro de huéspedes</Link></p>
 
       <article className="card" aria-labelledby="guest-name">
         <header className="card-head">
           <div>
-            <h1 id="guest-name" className="panel-title">{reservation.guestName}</h1>
-            <p className="panel-lead">
+            <h1 id="guest-name" className="card-title">{reservation.guestName}</h1>
+            <p className="card-lead">
               <Link href={`/pisos/${property.id}`}>{property.name}</Link>, {property.address}
             </p>
           </div>
-          <span className={`badge badge-large badge-${status}`}>{STATUS_LABEL[status]}</span>
+          <span className={`chip chip-large chip-${status}`}>{STATUS_LABEL[status]}</span>
         </header>
 
         <dl className="card-stay">
@@ -72,35 +72,40 @@ export default async function ReservationPage({ params }: PageProps<"/reservas/[
       </article>
 
       {status !== "cancelled" && (
-        <section className="prep-link" aria-labelledby="prep-title">
-          <div>
-            <h2 id="prep-title" className="section-title">Preparación del piso</h2>
-            <p className="panel-lead">
+        <section className="task" aria-labelledby="prep-title">
+          <h2 id="prep-title" className="task-head">
+            Preparación del piso
+            {progress.hasChecklist && <span>{progress.done} de {progress.total}</span>}
+          </h2>
+          <div className="task-body">
+            <p className="task-text">
               {!progress.hasChecklist
-                ? "Este piso no tiene lista de preparación."
+                ? "Este piso no tiene lista de preparación. Sin lista, la llegada no puede darse por preparada."
                 : progress.ready
-                  ? `Todo listo: ${progress.total} de ${progress.total} tareas hechas.`
-                  : `${progress.done} de ${progress.total} tareas hechas.`}
+                  ? "Todo listo: el piso está preparado para esta llegada."
+                  : "Quedan tareas por hacer antes de que llegue el huésped."}
             </p>
+            <div className="task-actions">
+              {progress.hasChecklist ? (
+                <Link href={`/reservas/${reservation.id}/preparar`} className="button">
+                  {status === "upcoming" ? "Preparar la llegada" : "Ver la preparación"}
+                </Link>
+              ) : (
+                <Link href={`/pisos/${reservation.propertyId}`} className="button">Crear lista</Link>
+              )}
+            </div>
           </div>
-          {progress.hasChecklist ? (
-            <Link href={`/reservas/${reservation.id}/preparar`} className="button">
-              {status === "upcoming" ? "Preparar la llegada" : "Ver la preparación"}
-            </Link>
-          ) : (
-            <Link href={`/pisos/${reservation.propertyId}`} className="button">Crear lista</Link>
-          )}
         </section>
       )}
 
       <section className="log" aria-labelledby="log-title">
         <h2 id="log-title" className="section-title">Bitácora</h2>
-        <p className="panel-lead">Lo que pase con esta estancia: peticiones, incidencias, acuerdos con el huésped.</p>
+        <p className="section-lead">Lo que pase con esta estancia: peticiones, incidencias, acuerdos con el huésped.</p>
         <NoteForm reservationId={reservation.id} />
         {reservation.notes.length === 0 ? (
-          <p className="ledger-empty">Todavía no hay notas.</p>
+          <p className="section-lead">Todavía no hay notas.</p>
         ) : (
-          <ol className="log-list">
+          <ol className="roadmap">
             {reservation.notes.map((note) => (
               <li key={note.id} className="log-entry">
                 <time dateTime={note.createdAt.toISOString()} className="log-time">{formatDateTime(note.createdAt)}</time>
@@ -114,7 +119,7 @@ export default async function ReservationPage({ params }: PageProps<"/reservas/[
       {cancellable && (
         <details className="danger">
           <summary className="danger-summary">Cancelar reserva</summary>
-          <p className="panel-lead">
+          <p className="section-lead">
             La reserva dejará de aparecer en tus llegadas y liberará las fechas del piso. Se queda en el
             historial con sus notas. Esto no cancela nada en Airbnb.
           </p>

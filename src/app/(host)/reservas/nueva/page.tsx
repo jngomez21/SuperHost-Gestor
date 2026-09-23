@@ -9,18 +9,19 @@ export default async function NewReservationPage({ searchParams }: PageProps<"/r
   const { piso } = await searchParams;
 
   return (
-    <main className="panel">
-      <h1 className="panel-title">Registrar reserva</h1>
+    <main className="page">
+      <p><Link href="/reservas" className="back-link">Libro de huéspedes</Link></p>
+      <h1 className="page-title">Registrar <span className="boxed">reserva</span></h1>
       {properties.length === 0 ? (
         <>
-          <p className="panel-lead">Para registrar una reserva primero necesitas un piso.</p>
-          <p className="form-actions">
-            <Link href="/pisos/nuevo" className="button">Añadir tu primer piso</Link>
+          <p className="page-lead">Para registrar una reserva primero necesitas un piso.</p>
+          <p className="form-actions section">
+            <Link href="/pisos/nuevo" className="button button-skew">Añadir tu primer piso</Link>
           </p>
         </>
       ) : (
         <>
-          <p className="panel-lead">Copia los datos de la reserva de Airbnb. Las fechas no pueden cruzarse con otra reserva del mismo piso.</p>
+          <p className="page-lead">Copia los datos de la reserva de Airbnb. Las fechas no pueden cruzarse con otra reserva del mismo piso.</p>
           <ReservationForm
             properties={properties.map(({ id, name, checkInTime, checkOutTime }) => ({ id, name, checkInTime, checkOutTime }))}
             preselected={typeof piso === "string" ? piso : undefined}

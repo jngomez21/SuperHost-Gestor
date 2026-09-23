@@ -15,9 +15,9 @@ export default async function PreparePage({ params }: PageProps<"/reservas/[id]/
   const cancelled = reservation.status === "cancelled";
 
   return (
-    <main className="panel prep">
+    <main className="page prep">
       <p><Link href={`/reservas/${reservation.id}`} className="back-link">Ficha de {reservation.guestName}</Link></p>
-      <h1 className="panel-title">Preparar {reservation.property.name}</h1>
+      <h1 className="page-title"><span className="boxed">Preparar</span> {reservation.property.name}</h1>
       {cancelled && (
         <p className="form-error">Esta reserva está cancelada: la lista se muestra solo para consulta.</p>
       )}

@@ -11,17 +11,17 @@ export default async function ReservationsPage() {
   const past = reservations.filter((r) => r.status === "finished" || r.status === "cancelled").reverse();
 
   return (
-    <main className="panel">
-      <header className="panel-head">
+    <main className="page">
+      <header className="page-head">
         <div>
-          <h1 className="panel-title">Libro de huéspedes</h1>
-          <p className="panel-lead">Todas tus reservas, con sus notas. Las terminadas y canceladas quedan abajo como historial.</p>
+          <h1 className="page-title">Libro de <span className="boxed">huéspedes</span></h1>
+          <p className="page-lead">Todas tus reservas, con sus notas. Las terminadas y canceladas quedan abajo como historial.</p>
         </div>
-        <Link href="/reservas/nueva" className="button">Registrar reserva</Link>
+        <Link href="/reservas/nueva" className="button button-skew">Registrar reserva</Link>
       </header>
 
       {reservations.length === 0 ? (
-        <p className="ledger-empty">Todavía no hay reservas. Registra la primera cuando te llegue una en Airbnb.</p>
+        <p className="section-lead section">Todavía no hay reservas. Registra la primera cuando te llegue una en Airbnb.</p>
       ) : (
         <>
           <Ledger title="Próximas y en curso" items={active} empty="No tienes reservas próximas." />
@@ -36,28 +36,28 @@ type Item = Awaited<ReturnType<typeof listReservations>>[number];
 
 function Ledger({ title, items, empty }: { title: string; items: Item[]; empty?: string }) {
   return (
-    <section className="ledger" aria-label={title}>
+    <section className="section" aria-label={title}>
       <h2 className="section-title">{title}</h2>
       {items.length === 0 ? (
-        <p className="ledger-empty">{empty}</p>
+        <p className="section-lead">{empty}</p>
       ) : (
-        <ul className="ledger-list">
+        <ul className="ledger">
           {items.map((r) => {
             const count = nights(r.checkIn, r.checkOut);
             return (
-            <li key={r.id}>
-              <Link href={`/reservas/${r.id}`} className={`ledger-row ledger-${r.status}`}>
-                <span className="ledger-dates">
-                  {formatDate(r.checkIn)} – {formatDate(r.checkOut)}
-                  <span className="ledger-nights">{count} {count === 1 ? "noche" : "noches"}</span>
-                </span>
-                <span className="ledger-guest">
-                  {r.guestName}
-                  <span className="ledger-property">{r.property.name}</span>
-                </span>
-                <span className={`badge badge-${r.status}`}>{STATUS_LABEL[r.status]}</span>
-              </Link>
-            </li>
+              <li key={r.id}>
+                <Link href={`/reservas/${r.id}`} className={`ledger-row ledger-${r.status}`}>
+                  <span className="ledger-dates">
+                    {formatDate(r.checkIn)} – {formatDate(r.checkOut)}
+                    <span className="ledger-nights">{count} {count === 1 ? "noche" : "noches"}</span>
+                  </span>
+                  <span className="ledger-guest">
+                    {r.guestName}
+                    <span className="ledger-property">{r.property.name}</span>
+                  </span>
+                  <span className={`chip chip-${r.status}`}>{STATUS_LABEL[r.status]}</span>
+                </Link>
+              </li>
             );
           })}
         </ul>

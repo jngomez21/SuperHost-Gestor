@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProperty } from "@/application/properties";
 import { listTasks } from "@/application/housekeeping";
@@ -13,9 +14,10 @@ export default async function EditPropertyPage({ params }: PageProps<"/pisos/[id
   const tasks = await listTasks(host.id, property.id);
 
   return (
-    <main className="panel">
-      <h1 className="panel-title">{property.name}</h1>
-      <p className="panel-lead">{property.address}</p>
+    <main className="page">
+      <p><Link href="/pisos" className="back-link">Tus pisos</Link></p>
+      <h1 className="page-title">{property.name}</h1>
+      <p className="page-lead">{property.address}</p>
       <PropertyForm id={property.id} initial={property} />
       <TaskEditor propertyId={property.id} tasks={tasks.map(({ id, label }) => ({ id, label }))} />
     </main>

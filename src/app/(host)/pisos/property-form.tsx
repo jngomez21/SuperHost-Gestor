@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { Field } from "@/app/_components/field";
+import { HandNote } from "@/app/_components/hand-note";
 import { SubmitButton } from "@/app/_components/submit-button";
 import { formatTime } from "@/app/_lib/format";
 import { saveProperty, type PropertyFormState } from "./actions";
@@ -102,53 +103,52 @@ export function PropertyForm({ id, initial = EMPTY }: { id: string | null; initi
         </fieldset>
 
         <div className="form-actions">
-          <SubmitButton pending="Guardando…">{id ? "Guardar cambios" : "Añadir piso"}</SubmitButton>
+          <SubmitButton pending="Guardando…" skew>{id ? "Guardar cambios" : "Añadir piso"}</SubmitButton>
           <Link href="/pisos" className="button button-quiet">Volver a pisos</Link>
         </div>
       </form>
 
-      <KeySleeve values={preview} />
+      <GuestPreview values={preview} />
     </div>
   );
 }
 
-function KeySleeve({ values }: { values: Record<keyof Values, string> }) {
-  const missing = <span className="sleeve-missing">Falta: tu huésped te lo preguntará</span>;
+function GuestPreview({ values }: { values: Record<keyof Values, string> }) {
+  const missing = <span className="preview-missing">Falta: tu huésped te lo preguntará</span>;
   return (
-    <aside className="sleeve-wrap" aria-labelledby="sleeve-title">
-      <h2 id="sleeve-title" className="sleeve-heading">Así lo verá tu huésped</h2>
-      <div className="sleeve-stage">
-        <div className="sleeve-tag" aria-hidden="true" />
-        <div className="sleeve">
-          <p className="sleeve-kicker">Bienvenido a</p>
-          <p className="sleeve-name">{values.name || "Tu piso"}</p>
-          <p className="sleeve-address">{values.address || "Dirección del piso"}</p>
-          <dl className="sleeve-facts">
-            <div className="sleeve-fact">
-              <dt>Llegada</dt>
-              <dd>desde las {values.checkInTime ? formatTime(values.checkInTime) : "—"}</dd>
-            </div>
-            <div className="sleeve-fact">
-              <dt>Salida</dt>
-              <dd>antes de las {values.checkOutTime ? formatTime(values.checkOutTime) : "—"}</dd>
-            </div>
-            <div className="sleeve-fact sleeve-fact-wide">
-              <dt>Wifi</dt>
-              <dd>
-                {values.wifiName ? (
-                  <>
-                    {values.wifiName}
-                    {values.wifiPassword && <span className="sleeve-secret">Clave {values.wifiPassword}</span>}
-                  </>
-                ) : missing}
-              </dd>
-            </div>
-            <div className="sleeve-fact sleeve-fact-wide">
-              <dt>Cómo entrar</dt>
-              <dd className="sleeve-long">{values.accessInstructions || missing}</dd>
-            </div>
-          </dl>
-        </div>
+    <aside className="preview-wrap" aria-labelledby="preview-title">
+      <h2 id="preview-title">
+        <HandNote arrow="down">Así lo verá tu huésped</HandNote>
+      </h2>
+      <div className="preview">
+        <p className="preview-kicker">Bienvenido a</p>
+        <p className="preview-name">{values.name || "Tu piso"}</p>
+        <p className="preview-address">{values.address || "Dirección del piso"}</p>
+        <dl className="preview-facts">
+          <div className="preview-fact">
+            <dt>Llegada</dt>
+            <dd>desde las {values.checkInTime ? formatTime(values.checkInTime) : "—"}</dd>
+          </div>
+          <div className="preview-fact">
+            <dt>Salida</dt>
+            <dd>antes de las {values.checkOutTime ? formatTime(values.checkOutTime) : "—"}</dd>
+          </div>
+          <div className="preview-fact preview-fact-wide">
+            <dt>Wifi</dt>
+            <dd>
+              {values.wifiName ? (
+                <>
+                  {values.wifiName}
+                  {values.wifiPassword && <span className="preview-secret">Clave {values.wifiPassword}</span>}
+                </>
+              ) : missing}
+            </dd>
+          </div>
+          <div className="preview-fact preview-fact-wide">
+            <dt>Cómo entrar</dt>
+            <dd className="preview-long">{values.accessInstructions || missing}</dd>
+          </div>
+        </dl>
       </div>
     </aside>
   );

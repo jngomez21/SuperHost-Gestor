@@ -11,38 +11,43 @@ export function TaskEditor({ propertyId, tasks }: { propertyId: string; tasks: T
   const addError = state?.errors.label ?? state?.errors.form;
 
   return (
-    <section className="sheet" aria-labelledby="sheet-title">
-      <h2 id="sheet-title" className="sheet-title">Lista de preparación</h2>
-      <p className="sheet-lead">
-        Lo que hay que dejar hecho antes de cada llegada. Al preparar una reserva marcarás estas tareas una a una.
-      </p>
-
-      {tasks.length === 0 ? (
-        <p className="sheet-empty">
-          Este piso no tiene tareas. Sin lista, sus llegadas no pueden darse por preparadas.
+    <section className="task" aria-labelledby="sheet-title">
+      <h2 id="sheet-title" className="task-head">
+        Lista de preparación
+        <span>{tasks.length} {tasks.length === 1 ? "tarea" : "tareas"}</span>
+      </h2>
+      <div className="task-body">
+        <p className="task-text">
+          Lo que hay que dejar hecho antes de cada llegada. Al preparar una reserva marcarás estas tareas una a una.
         </p>
-      ) : (
-        <ul className="sheet-list">
-          {tasks.map((task) => <TaskRow key={task.id} propertyId={propertyId} task={task} />)}
-        </ul>
-      )}
 
-      <form action={add} className="sheet-add" noValidate>
-        <label htmlFor="new-task" className="field-label">Añadir tarea</label>
-        <div className="sheet-add-row">
-          <input
-            id="new-task"
-            name="label"
-            className="input"
-            placeholder="Por ejemplo: regar las plantas"
-            maxLength={80}
-            aria-invalid={addError ? true : undefined}
-            aria-describedby={addError ? "new-task-error" : undefined}
-          />
-          <SubmitButton pending="Añadiendo…">Añadir</SubmitButton>
-        </div>
-        {addError && <p id="new-task-error" className="field-error" role="alert">{addError}</p>}
-      </form>
+        {tasks.length === 0 ? (
+          <p className="sheet-empty">
+            Este piso no tiene tareas. Sin lista, sus llegadas no pueden darse por preparadas.
+          </p>
+        ) : (
+          <ul className="sheet-list">
+            {tasks.map((task) => <TaskRow key={task.id} propertyId={propertyId} task={task} />)}
+          </ul>
+        )}
+
+        <form action={add} className="sheet-add" noValidate>
+          <label htmlFor="new-task" className="field-label">Añadir tarea</label>
+          <div className="sheet-add-row">
+            <input
+              id="new-task"
+              name="label"
+              className="input"
+              placeholder="Por ejemplo: regar las plantas"
+              maxLength={80}
+              aria-invalid={addError ? true : undefined}
+              aria-describedby={addError ? "new-task-error" : undefined}
+            />
+            <SubmitButton pending="Añadiendo…">Añadir</SubmitButton>
+          </div>
+          {addError && <p id="new-task-error" className="field-error" role="alert">{addError}</p>}
+        </form>
+      </div>
     </section>
   );
 }

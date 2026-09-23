@@ -68,7 +68,7 @@ export function ReservationForm({ properties, preselected }: { properties: Prope
       </fieldset>
 
       <div className="form-actions">
-        <SubmitButton pending="Registrando…">Registrar reserva</SubmitButton>
+        <SubmitButton pending="Registrando…" skew>Registrar reserva</SubmitButton>
         <Link href="/reservas" className="button button-quiet">Volver a reservas</Link>
       </div>
     </form>
