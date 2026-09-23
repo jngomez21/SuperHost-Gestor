@@ -1,0 +1,172 @@
+"use client";
+
+import Link from "next/link";
+import { cloneElement, useActionState, useState } from "react";
+import { SubmitButton } from "@/app/_components/submit-button";
+import { formatTime } from "@/app/_lib/format";
+import { saveProperty, type PropertyFormState } from "./actions";
+
+type Values = {
+  name: string;
+  address: string;
+  wifiName: string | null;
+  wifiPassword: string | null;
+  accessInstructions: string | null;
+  checkInTime: string;
+  checkOutTime: string;
+};
+
+const EMPTY: Values = {
+  name: "",
+  address: "",
+  wifiName: "",
+  wifiPassword: "",
+  accessInstructions: "",
+  checkInTime: "15:00",
+  checkOutTime: "11:00",
+};
+
+function normalize(values: Values): Record<keyof Values, string> {
+  return {
+    name: values.name,
+    address: values.address,
+    wifiName: values.wifiName ?? "",
+    wifiPassword: values.wifiPassword ?? "",
+    accessInstructions: values.accessInstructions ?? "",
+    checkInTime: values.checkInTime.slice(0, 5),
+    checkOutTime: values.checkOutTime.slice(0, 5),
+  };
+}
+
+export function PropertyForm({ id, initial = EMPTY }: { id: string | null; initial?: Values }) {
+  const [state, action] = useActionState<PropertyFormState, FormData>(saveProperty.bind(null, id), null);
+  const defaults = { ...normalize(initial), ...state?.values };
+  const [preview, setPreview] = useState(defaults);
+  const error = (name: keyof Values | "form") => state?.errors[name];
+
+  return (
+    <div className="editor">
+      <form
+        action={action}
+        className="form"
+        noValidate
+        onChange={(event) =>
+          setPreview(Object.fromEntries(new FormData(event.currentTarget)) as typeof preview)
+        }
+      >
+        {error("form") && <p className="form-error" role="alert">{error("form")}</p>}
+
+        <fieldset className="group">
+          <legend className="group-title">El piso</legend>
+          <Field name="name" label="Nombre" hint="Como lo llamas tú, por ejemplo Loft Chapinero." error={error("name")}>
+            <input id="name" name="name" className="input" defaultValue={defaults.name} required maxLength={80} />
+          </Field>
+          <Field name="address" label="Dirección" error={error("address")}>
+            <input id="address" name="address" className="input" defaultValue={defaults.address} required autoComplete="street-address" />
+          </Field>
+        </fieldset>
+
+        <fieldset className="group">
+          <legend className="group-title">Al llegar</legend>
+          <Field name="checkInTime" label="Puede entrar desde" error={error("checkInTime")}>
+            <input id="checkInTime" name="checkInTime" type="time" className="input input-time" defaultValue={defaults.checkInTime} />
+          </Field>
+          <Field
+            name="accessInstructions"
+            label="Cómo entra"
+            hint="Dónde está la llave, el código de la cerradura, qué decir en portería."
+            error={error("accessInstructions")}
+          >
+            <textarea id="accessInstructions" name="accessInstructions" className="input" rows={4} defaultValue={defaults.accessInstructions} />
+          </Field>
+        </fieldset>
+
+        <fieldset className="group">
+          <legend className="group-title">Wifi</legend>
+          <div className="form-row">
+            <Field name="wifiName" label="Nombre de la red" error={error("wifiName")}>
+              <input id="wifiName" name="wifiName" className="input" defaultValue={defaults.wifiName} />
+            </Field>
+            <Field name="wifiPassword" label="Clave" error={error("wifiPassword")}>
+              <input id="wifiPassword" name="wifiPassword" className="input" defaultValue={defaults.wifiPassword} />
+            </Field>
+          </div>
+        </fieldset>
+
+        <fieldset className="group">
+          <legend className="group-title">Al irse</legend>
+          <Field name="checkOutTime" label="Tiene que salir antes de" error={error("checkOutTime")}>
+            <input id="checkOutTime" name="checkOutTime" type="time" className="input input-time" defaultValue={defaults.checkOutTime} />
+          </Field>
+        </fieldset>
+
+        <div className="form-actions">
+          <SubmitButton pending="Guardando…">{id ? "Guardar cambios" : "Añadir piso"}</SubmitButton>
+          <Link href="/pisos" className="button button-quiet">Volver a pisos</Link>
+        </div>
+      </form>
+
+      <KeySleeve values={preview} />
+    </div>
+  );
+}
+
+function KeySleeve({ values }: { values: Record<keyof Values, string> }) {
+  const missing = <span className="sleeve-missing">Falta: tu huésped te lo preguntará</span>;
+  return (
+    <aside className="sleeve-wrap" aria-labelledby="sleeve-title">
+      <h2 id="sleeve-title" className="sleeve-heading">Así lo verá tu huésped</h2>
+      <div className="sleeve-stage">
+        <div className="sleeve-tag" aria-hidden="true" />
+        <div className="sleeve">
+          <p className="sleeve-kicker">Bienvenido a</p>
+          <p className="sleeve-name">{values.name || "Tu piso"}</p>
+          <p className="sleeve-address">{values.address || "Dirección del piso"}</p>
+          <dl className="sleeve-facts">
+            <div className="sleeve-fact">
+              <dt>Llegada</dt>
+              <dd>desde las {values.checkInTime ? formatTime(values.checkInTime) : "—"}</dd>
+            </div>
+            <div className="sleeve-fact">
+              <dt>Salida</dt>
+              <dd>antes de las {values.checkOutTime ? formatTime(values.checkOutTime) : "—"}</dd>
+            </div>
+            <div className="sleeve-fact sleeve-fact-wide">
+              <dt>Wifi</dt>
+              <dd>
+                {values.wifiName ? (
+                  <>
+                    {values.wifiName}
+                    {values.wifiPassword && <span className="sleeve-secret">Clave {values.wifiPassword}</span>}
+                  </>
+                ) : missing}
+              </dd>
+            </div>
+            <div className="sleeve-fact sleeve-fact-wide">
+              <dt>Cómo entrar</dt>
+              <dd className="sleeve-long">{values.accessInstructions || missing}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function Field({ name, label, hint, error, children }: {
+  name: string;
+  label: string;
+  hint?: string;
+  error?: string;
+  children: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>>;
+}) {
+  const describedBy = [hint && `${name}-hint`, error && `${name}-error`].filter(Boolean).join(" ") || undefined;
+  return (
+    <div className="field">
+      <label className="field-label" htmlFor={name}>{label}</label>
+      {hint && <p className="field-hint" id={`${name}-hint`}>{hint}</p>}
+      {cloneElement(children, { "aria-invalid": error ? true : undefined, "aria-describedby": describedBy })}
+      {error && <p className="field-error" id={`${name}-error`} role="alert">{error}</p>}
+    </div>
+  );
+}

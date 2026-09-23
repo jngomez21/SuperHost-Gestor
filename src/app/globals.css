@@ -276,7 +276,7 @@ body {
 .board-rail {
   margin-top: 2rem;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
   gap: 2.5rem 0;
   list-style: none;
   padding: 0;
@@ -426,4 +426,362 @@ body {
 
 @media (min-width: 56rem) {
   .step-state { grid-column: 1; }
+}
+
+/* ---------- Barra superior ---------- */
+
+.topbar {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.wordmark {
+  font-weight: 800;
+  font-stretch: 80%;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.topbar-nav {
+  display: flex;
+  gap: 0.25rem;
+  margin-right: auto;
+}
+
+.topbar-link {
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  color: var(--muted);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.topbar-link:hover {
+  color: var(--fg);
+  background: var(--line);
+}
+
+.topbar-link[aria-current="page"] {
+  color: #2a1d05;
+  background: var(--brass);
+}
+
+@media (max-width: 36rem) {
+  .topbar { flex-wrap: wrap; }
+  .wordmark { width: 100%; }
+}
+
+/* ---------- Casillero vacío ---------- */
+
+.board-empty {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (min-width: 48rem) {
+  .board-empty { grid-template-columns: 15rem 1fr; gap: 3rem; }
+}
+
+.board-empty .board-rail {
+  margin-top: 0;
+  grid-template-columns: 15rem;
+  justify-content: center;
+}
+
+.tag-ghost {
+  width: 100%;
+  height: 13rem;
+  margin-top: -0.4rem;
+  border: 2px dashed var(--brass);
+  border-radius: 7rem 7rem 1.25rem 1.25rem;
+  transform: rotate(-3deg);
+  opacity: 0.8;
+}
+
+.empty-copy {
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+}
+
+.empty-text {
+  color: rgb(243 245 242 / 0.75);
+}
+
+/* ---------- Editor con vista previa ---------- */
+
+.editor {
+  display: grid;
+  gap: 3rem;
+  align-items: start;
+}
+
+@media (min-width: 60rem) {
+  .editor { grid-template-columns: minmax(0, 1fr) 22rem; gap: 4rem; }
+  .sleeve-wrap { position: sticky; top: 1.5rem; }
+}
+
+.group {
+  border: 0;
+  margin: 0;
+  padding: 1.5rem 0 0;
+  border-top: 2px solid var(--line);
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.group-title {
+  float: left;
+  width: 100%;
+  font-size: 1.3rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.input-time {
+  max-width: 10rem;
+}
+
+/* ---------- El sobre de la llave ---------- */
+
+.sleeve-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.sleeve-stage {
+  position: relative;
+  isolation: isolate;
+  margin-top: 4.5rem;
+}
+
+.sleeve-tag {
+  position: absolute;
+  z-index: -1;
+  top: -3.75rem;
+  right: 2.25rem;
+  width: 5.5rem;
+  height: 8rem;
+  border-radius: 3rem 3rem 0.75rem 0.75rem;
+  background:
+    radial-gradient(120% 60% at 30% 0%, var(--brass-light), transparent 60%),
+    var(--brass);
+  transform: rotate(9deg);
+}
+
+.sleeve-tag::before {
+  content: "";
+  position: absolute;
+  top: 0.8rem;
+  left: 50%;
+  translate: -50% 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.sleeve {
+  position: relative;
+  padding: 2.25rem 1.75rem 1.75rem;
+  border-radius: 0.4rem 0.4rem 1rem 1rem;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 24px 40px -22px rgb(0 0 0 / 0.55);
+  -webkit-mask: radial-gradient(2.2rem 1.4rem at 50% 0, transparent 98%, #000);
+  mask: radial-gradient(2.2rem 1.4rem at 50% 0, transparent 98%, #000);
+}
+
+.sleeve-kicker {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.sleeve-name {
+  font-size: 2.1rem;
+  line-height: 1.05;
+  font-weight: 800;
+  font-stretch: 80%;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+
+.sleeve-address {
+  margin-top: 0.4rem;
+  color: #4a5367;
+  overflow-wrap: anywhere;
+}
+
+.sleeve-facts {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 2px dotted rgb(31 42 68 / 0.3);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.sleeve-fact-wide {
+  grid-column: 1 / -1;
+}
+
+.sleeve-fact dt {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #4a5367;
+}
+
+.sleeve-fact dd {
+  margin: 0.1rem 0 0;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.sleeve-secret {
+  display: block;
+  font-weight: 500;
+}
+
+.sleeve-long {
+  white-space: pre-line;
+  font-weight: 500;
+}
+
+.sleeve-missing {
+  color: var(--bad);
+  font-weight: 600;
+  font-style: italic;
+}
+
+/* ---------- Botón principal en modo oscuro ---------- */
+
+@media (prefers-color-scheme: dark) {
+  .button:not(.button-quiet) {
+    background: var(--brass);
+    color: #2a1d05;
+  }
+
+  .button:not(.button-quiet):hover {
+    background: var(--brass-light);
+  }
+
+  .tag .button:not(.button-quiet) {
+    background: var(--ink);
+    color: var(--paper);
+  }
+}
+
+/* ---------- Llave enlazable ---------- */
+
+.tag-link {
+  display: block;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.tag-link:hover,
+.tag-link:focus-visible {
+  transform: rotate(0deg) translateY(-3px);
+}
+
+.tag-link .slot-name,
+.tag-link .slot-detail {
+  display: block;
+}
+
+.tag-edit {
+  display: block;
+  margin-top: 1rem;
+  text-align: center;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag-link { transition: none; }
+}
+
+/* ---------- Formularios ---------- */
+
+.form {
+  margin-top: 2rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 36rem) {
+  .form-row { grid-template-columns: 1fr 1fr; }
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+}
+
+.field-label {
+  font-weight: 650;
+}
+
+.field-hint {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.8rem;
+  border: 2px solid var(--line);
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+}
+
+.input:focus-visible {
+  border-color: var(--brass);
+  outline: none;
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--bad);
+}
+
+.field-error {
+  color: var(--bad);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .field-error { color: #e08aa9; }
+  .input[aria-invalid="true"] { border-color: #e08aa9; }
+}
+
+.form-error {
+  padding: 0.9rem 1rem;
+  border-radius: 0.8rem;
+  background: rgb(140 59 90 / 0.12);
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }

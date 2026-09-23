@@ -31,5 +31,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async signIn({ user }) {
       return user.email === process.env.HOST_EMAIL;
     },
+    session({ session, user }) {
+      return { user: { id: user.id, email: user.email, name: user.name }, expires: session.expires };
+    },
   },
 });

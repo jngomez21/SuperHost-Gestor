@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
 import { sql } from "drizzle-orm";
-import { auth, signOut } from "@/auth";
+import { requireHost } from "@/app/_lib/host";
 import { db } from "@/infrastructure/db";
 
 async function checkDatabase() {
@@ -15,18 +14,16 @@ async function checkDatabase() {
 
 const PHASES = [
   { name: "Cimientos", state: "Hecho", status: "done" },
-  { name: "Pisos y reservas", state: "Lo siguiente", status: "next" },
+  { name: "Pisos y reservas", state: "En curso", status: "next" },
   { name: "Checklist de limpieza", state: "Pendiente", status: "" },
   { name: "Mensajes automáticos", state: "Pendiente", status: "" },
   { name: "Avisos cruzados", state: "Pendiente", status: "" },
 ];
 
 export default async function PanelPage() {
-  const session = await auth();
-  if (!session?.user?.email) redirect("/login");
-
+  const host = await requireHost();
   const database = await checkDatabase();
-  const expires = new Date(session.expires).toLocaleDateString("es-CO", {
+  const expires = new Date(host.expires).toLocaleDateString("es-CO", {
     day: "numeric",
     month: "long",
   });
@@ -62,20 +59,12 @@ export default async function PanelPage() {
     <main className="panel">
       <header className="panel-head">
         <div>
-          <h1 className="panel-title">Hola, {session.user.email.split("@")[0]}.</h1>
+          <h1 className="panel-title">Hola, {host.email.split("@")[0]}.</h1>
           <p className="panel-lead">
             Todavía no hay reservas que gestionar: esto es lo que ya funciona
             por debajo, comprobado ahora mismo.
           </p>
         </div>
-        <form
-          action={async () => {
-            "use server";
-            await signOut({ redirectTo: "/login" });
-          }}
-        >
-          <button type="submit" className="button button-quiet">Cerrar sesión</button>
-        </form>
       </header>
 
       <section className="board" aria-labelledby="board-title">
