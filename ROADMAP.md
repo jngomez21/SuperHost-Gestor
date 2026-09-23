@@ -53,7 +53,9 @@ Historias 14, 15, 16, 17, 18. Módulo del que dependen `housekeeping` y `messagi
 
 **Hecho cuando:** el host puede dar de alta un piso, registrar una reserva y ver su estado en el panel, sin nada automatizado todavía.
 
-## Fase 2 — Checklist de preparación
+## Fase 2 — Checklist de preparación ✅ Hecha
+
+Cambios respecto al plan: la ficha de la reserva enlaza a su preparación (o a crear la lista si el piso no tiene); la pantalla de preparar avisa mientras guarda y pide confirmación si se cierra a mitad de guardado. La 2.7 revisó todo a 320–390 px y en modo claro: piezas de papel con canto propio en claro, bordes de campos a 3:1, horas y fechas que no se parten, y sin scroll horizontal.
 
 Historias 9, 10, 11, 12. Depende solo de la Fase 1. Va antes que mensajería porque es la pieza más simple de las dos que faltan (CRUD + estado, sin proveedores externos ni disparo por tiempo) — valida que el modelo de reserva aguanta antes de meter la complejidad de QStash/Resend.
 

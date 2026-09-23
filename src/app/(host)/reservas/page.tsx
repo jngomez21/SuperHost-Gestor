@@ -42,12 +42,14 @@ function Ledger({ title, items, empty }: { title: string; items: Item[]; empty?:
         <p className="ledger-empty">{empty}</p>
       ) : (
         <ul className="ledger-list">
-          {items.map((r) => (
+          {items.map((r) => {
+            const count = nights(r.checkIn, r.checkOut);
+            return (
             <li key={r.id}>
               <Link href={`/reservas/${r.id}`} className={`ledger-row ledger-${r.status}`}>
                 <span className="ledger-dates">
                   {formatDate(r.checkIn)} – {formatDate(r.checkOut)}
-                  <span className="ledger-nights">{nights(r.checkIn, r.checkOut)} noches</span>
+                  <span className="ledger-nights">{count} {count === 1 ? "noche" : "noches"}</span>
                 </span>
                 <span className="ledger-guest">
                   {r.guestName}
@@ -56,7 +58,8 @@ function Ledger({ title, items, empty }: { title: string; items: Item[]; empty?:
                 <span className={`badge badge-${r.status}`}>{STATUS_LABEL[r.status]}</span>
               </Link>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
     </section>

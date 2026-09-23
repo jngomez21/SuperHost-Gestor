@@ -15,10 +15,18 @@
   --line: rgb(31 42 68 / 0.14);
   --board: var(--ink);
   --rail: #10182b;
+  /* En claro, las piezas de papel se funden con la página: más blancas y con canto. */
+  --sheet: #fdfdfb;
+  --sheet-edge: rgb(31 42 68 / 0.12);
+  /* Borde de campos: 3:1 contra el fondo, a diferencia de --line (decorativa). */
+  --field: rgb(31 42 68 / 0.55);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
+    --sheet: var(--paper);
+    --sheet-edge: transparent;
+    --field: rgb(238 241 236 / 0.4);
     --board: #0b1120;
     --rail: #2a3552;
     --bg: #1b243a;
@@ -53,6 +61,8 @@ body {
   max-width: 68rem;
   margin: 0 auto;
   padding: 3rem 1.25rem;
+  /* La llave inclinada (y su balanceo) asoma por la derecha en móviles estrechos. */
+  overflow-x: clip;
 }
 
 @media (min-width: 60rem) {
@@ -476,6 +486,7 @@ body {
   .topbar { flex-wrap: wrap; gap: 0.5rem 1rem; }
   .wordmark { margin-right: auto; }
   .topbar-nav { order: 3; width: 100%; margin-right: 0; }
+  .topbar-link { padding-inline: 0.8rem; }
   .topbar .button { padding: 0.5rem 0.9rem; font-size: 0.95rem; }
 }
 
@@ -564,6 +575,8 @@ body {
   position: relative;
   isolation: isolate;
   margin-top: 4.5rem;
+  /* La máscara del sobre recorta box-shadow; drop-shadow en el padre sigue su silueta. */
+  filter: drop-shadow(0 0 1px var(--sheet-edge)) drop-shadow(0 18px 16px rgb(0 0 0 / 0.2));
 }
 
 .sleeve-tag {
@@ -596,9 +609,8 @@ body {
   position: relative;
   padding: 2.25rem 1.75rem 1.75rem;
   border-radius: 0.4rem 0.4rem 1rem 1rem;
-  background: var(--paper);
+  background: var(--sheet);
   color: var(--ink);
-  box-shadow: 0 24px 40px -22px rgb(0 0 0 / 0.55);
   -webkit-mask: radial-gradient(2.2rem 1.4rem at 50% 0, transparent 98%, #000);
   mask: radial-gradient(2.2rem 1.4rem at 50% 0, transparent 98%, #000);
 }
@@ -749,7 +761,7 @@ body {
   width: 100%;
   padding: 0.75rem 0.9rem;
   border-radius: 0.8rem;
-  border: 2px solid var(--line);
+  border: 2px solid var(--field);
   background: transparent;
   color: var(--fg);
   font: inherit;
@@ -907,7 +919,7 @@ body {
 }
 
 @media (max-width: 43.99rem) {
-  .ledger-guest { grid-row: 2; }
+  .ledger-row .ledger-guest { grid-row: 2; }
   .ledger-row .badge { grid-row: 1; grid-column: 2; }
 }
 
@@ -943,9 +955,9 @@ body {
   margin-top: 1.25rem;
   padding: 2rem 1.5rem;
   border-radius: 0.5rem;
-  background: var(--paper);
+  background: var(--sheet);
   color: var(--ink);
-  box-shadow: 0 24px 40px -26px rgb(0 0 0 / 0.6);
+  box-shadow: 0 0 0 1px var(--sheet-edge), 0 24px 40px -26px rgb(0 0 0 / 0.6);
 }
 
 @media (min-width: 48rem) {
@@ -1195,9 +1207,9 @@ body {
   max-width: 44rem;
   padding: 2rem 1.5rem;
   border-radius: 0.4rem;
-  background: var(--paper);
+  background: var(--sheet);
   color: var(--ink);
-  box-shadow: 0 24px 40px -26px rgb(0 0 0 / 0.6);
+  box-shadow: 0 0 0 1px var(--sheet-edge), 0 24px 40px -26px rgb(0 0 0 / 0.6);
   --muted: #4a5367;
   --bad: #8c3b5a;
   --fg: var(--ink);
@@ -1259,6 +1271,11 @@ body {
   gap: 0.25rem;
 }
 
+@media (max-width: 36rem) {
+  .sheet-row { grid-template-columns: auto minmax(0, 1fr); gap: 0 0.9rem; padding-top: 0.6rem; }
+  .sheet-actions { grid-column: 2; margin-left: -0.6rem; }
+}
+
 .sheet-edit {
   grid-column: 1 / -1;
   display: flex;
@@ -1278,7 +1295,7 @@ body {
 .sheet .input {
   background: #fff;
   color: var(--ink);
-  border-color: rgb(31 42 68 / 0.25);
+  border-color: rgb(31 42 68 / 0.55);
 }
 
 .sheet .button:not(.button-quiet) {
@@ -1393,9 +1410,9 @@ body {
   margin-top: 1.5rem;
   padding: 0.5rem 1rem;
   border-radius: 0.4rem;
-  background: var(--paper);
+  background: var(--sheet);
   color: var(--ink);
-  box-shadow: 0 24px 40px -26px rgb(0 0 0 / 0.6);
+  box-shadow: 0 0 0 1px var(--sheet-edge), 0 24px 40px -26px rgb(0 0 0 / 0.6);
 }
 
 .prep-list {
@@ -1487,7 +1504,7 @@ body {
   border: 3px solid #2f5a42;
   border-radius: 0.5rem;
   color: #2f5a42;
-  background: rgb(243 245 242 / 0.9);
+  background: var(--sheet);
   font-weight: 800;
   font-size: 1.15rem;
   transform: rotate(-8deg);
@@ -1509,7 +1526,7 @@ body {
   margin-left: 0.6rem;
   font-size: 0.9rem;
   font-weight: 650;
-  color: var(--brass-light);
+  color: var(--st-upcoming);
 }
 
 /* ---------- Por preparar ---------- */
@@ -1525,17 +1542,24 @@ body {
   font-weight: 650;
 }
 
+/* Subgrid: la columna del día mide lo que el día más largo, igual en todas las filas. */
 .todo-list {
   margin-top: 1rem;
   list-style: none;
   padding: 0;
   display: grid;
-  gap: 0.6rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.6rem 1rem;
+}
+
+.todo-list > li,
+.todo-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
 }
 
 .todo-row {
-  display: grid;
-  grid-template-columns: 5.5rem minmax(0, 1fr) auto;
   gap: 0.5rem 1rem;
   align-items: center;
   padding: 0.9rem 1rem;
@@ -1591,7 +1615,7 @@ body {
 }
 
 @media (max-width: 30rem) {
-  .todo-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .todo-list { grid-template-columns: minmax(0, 1fr) auto; }
   .todo-day { grid-column: 1; }
   .todo-row .ledger-guest,
   .todo-progress { grid-column: 1; }
@@ -1616,6 +1640,7 @@ body {
   color: var(--fg);
   font-size: 0.8rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .prep-chip-ok {

@@ -15,15 +15,18 @@ const dateTimeFormat = new Intl.DateTimeFormat("es-CO", {
   timeZone: "America/Bogota",
 });
 
+// Una hora o una fecha no se parten entre líneas ("11:00 / a. m." en móvil).
+const unbreakable = (text: string) => text.replace(/\s/g, " ");
+
 export function formatTime(hhmm: string): string {
   const [hours, minutes] = hhmm.split(":").map(Number);
   if (Number.isNaN(hours) || Number.isNaN(minutes)) return hhmm;
-  return timeFormat.format(new Date(2000, 0, 1, hours, minutes));
+  return unbreakable(timeFormat.format(new Date(2000, 0, 1, hours, minutes)));
 }
 
 export function formatDate(isoDate: string): string {
   const date = new Date(`${isoDate}T00:00:00Z`);
-  return Number.isNaN(date.getTime()) ? isoDate : dateFormat.format(date);
+  return Number.isNaN(date.getTime()) ? isoDate : unbreakable(dateFormat.format(date));
 }
 
 const longDateFormat = new Intl.DateTimeFormat("es-CO", {

@@ -79,9 +79,13 @@ export default async function ReservationPage({ params }: PageProps<"/reservas/[
                   : `${progress.done} de ${progress.total} tareas hechas.`}
             </p>
           </div>
-          <Link href={`/reservas/${reservation.id}/preparar`} className="button">
-            {status === "upcoming" ? "Preparar la llegada" : "Ver la preparación"}
-          </Link>
+          {progress.hasChecklist ? (
+            <Link href={`/reservas/${reservation.id}/preparar`} className="button">
+              {status === "upcoming" ? "Preparar la llegada" : "Ver la preparación"}
+            </Link>
+          ) : (
+            <Link href={`/pisos/${reservation.propertyId}`} className="button">Crear lista</Link>
+          )}
         </section>
       )}
 
