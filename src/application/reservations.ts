@@ -4,17 +4,13 @@ import { propertyTable, reservationNoteTable, reservationTable } from "@/infrast
 import { isUuid, type Raw } from "@/domain/fields";
 import { reservationStatus } from "@/domain/reservation/status";
 import { validateNote, validateReservation } from "@/domain/reservation/validate";
-import { getProperty } from "./properties";
+import { getProperty, ownedPropertyIds } from "./properties";
 
 const OVERLAP = "23P01";
 
 function pgCode(error: unknown): string | undefined {
   const e = error as { code?: string; cause?: { code?: string } };
   return e?.code ?? e?.cause?.code;
-}
-
-function ownedPropertyIds(hostId: string) {
-  return db.select({ id: propertyTable.id }).from(propertyTable).where(eq(propertyTable.hostId, hostId));
 }
 
 export async function listReservations(hostId: string, now = new Date()) {
