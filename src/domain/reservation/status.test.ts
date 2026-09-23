@@ -1,6 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { reservationStatus } from "./status.ts";
+import { nights, reservationStatus } from "./status.ts";
+
+test("noches entre llegada y salida, también cruzando meses y años", () => {
+  assert.equal(nights("2026-10-10", "2026-10-15"), 5);
+  assert.equal(nights("2026-10-30", "2026-11-02"), 3);
+  assert.equal(nights("2026-12-31", "2027-01-01"), 1);
+});
 
 const schedule = { checkInTime: "15:00", checkOutTime: "11:00" };
 const stay = { checkIn: "2026-10-10", checkOut: "2026-10-15", cancelledAt: null };

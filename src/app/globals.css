@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light dark;
   --ink: #1f2a44;
   --paper: #f3f5f2;
   --brass: #b3862f;
@@ -784,4 +785,287 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+/* ---------- Estados de reserva ---------- */
+
+:root {
+  --st-upcoming: #7c5a1a;
+  --st-in_house: #2f5a42;
+  --st-finished: #5b6477;
+  --st-cancelled: #8c3b5a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --st-upcoming: #d9b870;
+    --st-in_house: #8fc3a5;
+    --st-finished: #a3abbd;
+    --st-cancelled: #e08aa9;
+  }
+}
+
+.badge {
+  justify-self: end;
+  padding: 0.15rem 0.7rem;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.badge-upcoming { color: var(--st-upcoming); }
+.badge-in_house { color: var(--st-in_house); }
+.badge-finished { color: var(--st-finished); }
+.badge-cancelled { color: var(--st-cancelled); }
+
+.badge-large {
+  font-size: 1.05rem;
+  padding: 0.3rem 1rem;
+  border-width: 3px;
+  transform: rotate(-5deg);
+}
+
+/* ---------- Alta de reserva ---------- */
+
+.form-single {
+  max-width: 44rem;
+}
+
+.stay {
+  padding: 0.9rem 1.1rem;
+  border-radius: 0.8rem;
+  background: var(--line);
+}
+
+.stay-empty {
+  color: var(--muted);
+}
+
+.stay-wrong {
+  color: var(--st-cancelled);
+  font-weight: 600;
+}
+
+.stay-nights {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--st-upcoming);
+}
+
+/* ---------- Libro de huéspedes ---------- */
+
+.ledger {
+  margin-top: 2.5rem;
+}
+
+.ledger-list {
+  margin-top: 1rem;
+  list-style: none;
+  padding: 0;
+  border-top: 2px solid var(--line);
+}
+
+.ledger-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.35rem 1.25rem;
+  align-items: center;
+  padding: 1rem 0.5rem;
+  border-bottom: 2px solid var(--line);
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (min-width: 44rem) {
+  .ledger-row { grid-template-columns: 15rem minmax(0, 1fr) auto; }
+}
+
+.ledger-row:hover {
+  background: var(--line);
+}
+
+.ledger-dates {
+  font-weight: 700;
+}
+
+.ledger-nights,
+.ledger-property {
+  display: block;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.92rem;
+}
+
+.ledger-guest {
+  font-weight: 650;
+}
+
+@media (max-width: 43.99rem) {
+  .ledger-guest { grid-row: 2; }
+  .ledger-row .badge { grid-row: 1; grid-column: 2; }
+}
+
+.ledger-cancelled .ledger-dates,
+.ledger-cancelled .ledger-guest {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  color: var(--muted);
+}
+
+.ledger-empty {
+  margin-top: 1rem;
+  color: var(--muted);
+}
+
+/* ---------- Ficha de registro ---------- */
+
+.back-link {
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.back-link::before {
+  content: "‹ ";
+}
+
+.card {
+  --st-upcoming: #7c5a1a;
+  --st-in_house: #2f5a42;
+  --st-finished: #5b6477;
+  --st-cancelled: #8c3b5a;
+  --muted: #4a5367;
+  margin-top: 1.25rem;
+  padding: 2rem 1.5rem;
+  border-radius: 0.5rem;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 24px 40px -26px rgb(0 0 0 / 0.6);
+}
+
+@media (min-width: 48rem) {
+  .card { padding: 2.5rem 2.75rem; }
+}
+
+.card a {
+  color: inherit;
+}
+
+.card-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+}
+
+.card-stay,
+.card-contact {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 2px dotted rgb(31 42 68 / 0.3);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 1.25rem;
+}
+
+.card dt {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.card dd {
+  margin: 0.1rem 0 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.card dd.card-sub,
+.card .card-sub {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* ---------- Bitácora ---------- */
+
+.log {
+  margin-top: 3rem;
+  max-width: 44rem;
+}
+
+.note-form {
+  margin-top: 1.25rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.log-list {
+  margin-top: 1.75rem;
+  list-style: none;
+  padding: 0 0 0 1.25rem;
+  border-left: 3px solid var(--line);
+  display: grid;
+  gap: 1.25rem;
+}
+
+.log-entry {
+  position: relative;
+}
+
+.log-entry::before {
+  content: "";
+  position: absolute;
+  left: -1.8rem;
+  top: 0.35rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background: var(--brass);
+}
+
+.log-time {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.log-body {
+  white-space: pre-line;
+}
+
+/* ---------- Cancelar ---------- */
+
+.danger {
+  margin-top: 3rem;
+  max-width: 44rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--line);
+}
+
+.danger-summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--st-cancelled);
+  width: fit-content;
+}
+
+.danger form {
+  margin-top: 1rem;
+}
+
+.button-danger,
+.button-danger:not(.button-quiet) {
+  background: var(--bad);
+  color: #fff;
+}
+
+.button-danger:hover,
+.button-danger:not(.button-quiet):hover {
+  background: #a3486b;
 }

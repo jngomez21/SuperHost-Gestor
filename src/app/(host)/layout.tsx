@@ -11,6 +11,7 @@ export default async function HostLayout({ children }: LayoutProps<"/">) {
         <p className="wordmark">Gestor de llegadas</p>
         <nav className="topbar-nav" aria-label="Principal">
           <NavLink href="/panel">Llegadas</NavLink>
+          <NavLink href="/reservas">Reservas</NavLink>
           <NavLink href="/pisos">Pisos</NavLink>
         </nav>
         <form

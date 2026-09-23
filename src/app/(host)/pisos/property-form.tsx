@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { cloneElement, useActionState, useState } from "react";
+import { useActionState, useState } from "react";
+import { Field } from "@/app/_components/field";
 import { SubmitButton } from "@/app/_components/submit-button";
 import { formatTime } from "@/app/_lib/format";
 import { saveProperty, type PropertyFormState } from "./actions";
@@ -150,23 +151,5 @@ function KeySleeve({ values }: { values: Record<keyof Values, string> }) {
         </div>
       </div>
     </aside>
-  );
-}
-
-function Field({ name, label, hint, error, children }: {
-  name: string;
-  label: string;
-  hint?: string;
-  error?: string;
-  children: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>>;
-}) {
-  const describedBy = [hint && `${name}-hint`, error && `${name}-error`].filter(Boolean).join(" ") || undefined;
-  return (
-    <div className="field">
-      <label className="field-label" htmlFor={name}>{label}</label>
-      {hint && <p className="field-hint" id={`${name}-hint`}>{hint}</p>}
-      {cloneElement(children, { "aria-invalid": error ? true : undefined, "aria-describedby": describedBy })}
-      {error && <p className="field-error" id={`${name}-error`} role="alert">{error}</p>}
-    </div>
   );
 }
