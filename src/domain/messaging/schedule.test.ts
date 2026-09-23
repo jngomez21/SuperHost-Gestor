@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { dispatchPlan, messageStatus, sendAt } from "./schedule.ts";
+import { dispatchPlan, messageStatus, planMessages, sendAt } from "./schedule.ts";
 
 const stay = { checkIn: "2026-10-01", checkOut: "2026-10-04" };
 const registeredAt = new Date("2026-09-23T20:00:00Z");
@@ -12,6 +12,24 @@ test("hora de envío: días respecto a la llegada o la salida, en hora de Colomb
 
 test("hora de envío: la bienvenida toca al registrar la reserva", () => {
   assert.equal(sendAt({ trigger: "booked", dayOffset: 0, sendTime: null }, stay, registeredAt), registeredAt);
+});
+
+const templates = [
+  { name: "bienvenida", trigger: "booked", dayOffset: 0, sendTime: null },
+  { name: "llegada", trigger: "check_in", dayOffset: -1, sendTime: "10:00" },
+  { name: "salida", trigger: "check_out", dayOffset: -1, sendTime: "19:00" },
+] as const;
+
+test("programar: una reserva por llegar recibe todo, aunque algo ya toque", () => {
+  const lateBooking = new Date("2026-09-30T20:00:00Z");
+  const planned = planMessages([...templates], stay, false, lateBooking);
+  assert.deepEqual(planned.map((p) => p.template.name), ["bienvenida", "llegada", "salida"]);
+});
+
+test("programar: con la estancia empezada, sin bienvenida ni mensajes ya pasados", () => {
+  const inHouse = new Date("2026-10-02T12:00:00Z");
+  const planned = planMessages([...templates], stay, true, inHouse);
+  assert.deepEqual(planned.map((p) => p.template.name), ["salida"]);
 });
 
 const now = new Date("2026-09-30T15:00:00Z");

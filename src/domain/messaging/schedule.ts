@@ -10,6 +10,14 @@ export function sendAt(timing: Timing, stay: Stay, registeredAt: Date): Date {
   return localInstant(addDays(base, timing.dayOffset), timing.sendTime);
 }
 
+// Si la estancia ya empezó al registrarla, la bienvenida y lo que ya pasó llegarían tarde:
+// solo se programan los mensajes que aún están por delante.
+export function planMessages<T extends Timing>(templates: T[], stay: Stay, started: boolean, now: Date) {
+  return templates
+    .map((template) => ({ template, sendAt: sendAt(template, stay, now) }))
+    .filter(({ template, sendAt }) => !started || (template.trigger !== "booked" && sendAt > now));
+}
+
 export type MessageStatus = "sent" | "cancelled" | "due" | "scheduled";
 
 type Message = { sendAt: Date; sentAt: Date | null; cancelledAt: Date | null; reservationCancelled: boolean };

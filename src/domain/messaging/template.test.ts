@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { messageValues, render, STANDARD_TEMPLATES, timingLabel, validateTemplate } from "./template.ts";
+import { messageValues, render, STANDARD_TEMPLATES, timingLabel, validateMessage, validateTemplate } from "./template.ts";
 
 const stay = { guestName: "Marta Gómez Ruiz", checkIn: "2026-09-24", checkOut: "2026-09-27" };
 const place = {
@@ -63,6 +63,12 @@ test("las plantillas estándar pasan su propia validación", () => {
     const result = validateTemplate({ ...standard, dayOffset: String(standard.dayOffset), sendTime: standard.sendTime ?? "" });
     assert.ok(result.ok, standard.name);
   }
+});
+
+test("mensaje editado: exige texto y lo guarda sin rellenar variables", () => {
+  assert.ok(!validateMessage({ body: "  " }).ok);
+  const result = validateMessage({ body: " Hola {nombre} " });
+  assert.ok(result.ok && result.value.body === "Hola {nombre}");
 });
 
 test("cuándo se envía, en palabras", () => {

@@ -1,9 +1,10 @@
 import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
 import { db } from "@/infrastructure/db";
-import { propertyTable, reservationNoteTable, reservationTable } from "@/infrastructure/schema";
+import { propertyTable, reservationMessageTable, reservationNoteTable, reservationTable } from "@/infrastructure/schema";
 import { isUuid, type Raw } from "@/domain/fields";
 import { reservationStatus } from "@/domain/reservation/status";
 import { validateNote, validateReservation } from "@/domain/reservation/validate";
+import { messagesToSchedule } from "./messaging";
 import { getProperty, ownedPropertyIds } from "./properties";
 
 const OVERLAP = "23P01";
@@ -51,16 +52,26 @@ export async function getReservation(hostId: string, id: string, now = new Date(
   };
 }
 
-export async function createReservation(hostId: string, raw: Raw) {
+export async function createReservation(hostId: string, raw: Raw, now = new Date()) {
   const input = validateReservation(raw);
   if (!input.ok) return input;
-  if (!(await getProperty(hostId, input.value.propertyId))) {
+  const property = await getProperty(hostId, input.value.propertyId);
+  if (!property) {
     return { ok: false as const, errors: { propertyId: "Elige uno de tus pisos." } };
   }
 
+  const id = crypto.randomUUID();
+  const started = reservationStatus({ ...input.value, cancelledAt: null }, property, now) !== "upcoming";
+  const messages = await messagesToSchedule(hostId, { ...input.value, id }, started, now);
+  const insertReservation = db.insert(reservationTable).values({ ...input.value, id });
+
   try {
-    const [row] = await db.insert(reservationTable).values(input.value).returning({ id: reservationTable.id });
-    return { ok: true as const, value: row };
+    if (messages.length > 0) {
+      await db.batch([insertReservation, db.insert(reservationMessageTable).values(messages)]);
+    } else {
+      await insertReservation;
+    }
+    return { ok: true as const, value: { id } };
   } catch (error) {
     if (pgCode(error) === OVERLAP) {
       return {

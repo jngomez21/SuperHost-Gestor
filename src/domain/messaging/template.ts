@@ -72,6 +72,18 @@ export function render(body: string, values: Values): { text: string; missing: V
   return { text, missing: [...missing] };
 }
 
+function bodyError(body: string): string | undefined {
+  if (!body) return "Escribe el mensaje.";
+  if (body.length > 2000) return "El mensaje no puede pasar de 2000 caracteres.";
+}
+
+// Texto final de un mensaje concreto: se envía tal cual, sin variables.
+export function validateMessage(raw: Raw): Result<{ body: string }> {
+  const body = text(raw, "body");
+  const error = bodyError(body);
+  return error ? { ok: false, errors: { body: error } } : { ok: true, value: { body } };
+}
+
 export type TemplateInput = {
   name: string;
   body: string;
@@ -96,8 +108,8 @@ export function validateTemplate(raw: Raw): Result<TemplateInput> {
   else if (value.name.length > 60) errors.name = "El nombre no puede pasar de 60 caracteres.";
 
   const unknown = new Set([...value.body.matchAll(PLACEHOLDER)].map((m) => m[1]).filter((n) => !isVariable(n)));
-  if (!value.body) errors.body = "Escribe el mensaje.";
-  else if (value.body.length > 2000) errors.body = "El mensaje no puede pasar de 2000 caracteres.";
+  const bodyProblem = bodyError(value.body);
+  if (bodyProblem) errors.body = bodyProblem;
   else if (unknown.size) {
     const names = [...unknown].map((n) => `{${n}}`).join(", ");
     errors.body = `No conozco ${names}. Usa las variables de la lista, en minúsculas.`;
