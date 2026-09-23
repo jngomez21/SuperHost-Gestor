@@ -8,6 +8,20 @@
       "when": 1790110310191,
       "tag": "0000_careful_susan_delgado",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790179486701,
+      "tag": "0001_pisos_y_reservas",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790179494950,
+      "tag": "0002_reservas_sin_solapamiento",
+      "breakpoints": true
     }
   ]
 }

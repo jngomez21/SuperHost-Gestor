@@ -2,7 +2,9 @@
 
 Basado en `SPEC.md` (historias de usuario) y `ARCHITECTURE.md` (módulos de dominio y ADRs). Las fases siguen las dependencias reales entre módulos (`property` → `reservation` → `housekeeping`/`messaging`), no un orden arbitrario de prioridad de negocio. Cada fase, al cerrarse, deja algo funcionando de punta a punta — ninguna depende de rehacer trabajo de una fase anterior.
 
-## Fase 0 — Fundaciones técnicas (walking skeleton)
+## Fase 0 — Fundaciones técnicas (walking skeleton) ✅ Hecha
+
+Cambios respecto al plan original: Drizzle en lugar de Prisma (ADR-003), driver HTTP de Neon por el proxy corporativo, y la 0.7 quedó como `npm run check` (BD, deploy y firma de QStash).
 
 Sin historias de usuario propias. Objetivo: probar que cada pieza externa de las ADRs funciona de extremo a extremo, sin lógica de negocio encima, para no descubrir un fallo de integración a mitad de una fase con trabajo real ya construido.
 
@@ -22,11 +24,30 @@ Sin historias de usuario propias. Objetivo: probar que cada pieza externa de las
 
 Historias 14, 15, 16, 17, 18. Módulo del que dependen `housekeeping` y `messaging`. Se elige primero porque nada más puede construirse sin él.
 
-- Alta de propiedades (dirección, wifi, instrucciones de acceso).
-- Alta manual de reservas (huésped, fechas, propiedad).
-- Transición automática de estados de reserva según hitos temporales.
-- Notas/incidencias por reserva.
-- Panel con todas las reservas próximas y su estado.
+### Decisiones
+
+- **Estado derivado, no guardado.** Se calcula al leer a partir de fechas y horas: *cancelada* (tiene `cancelledAt`, único estado manual) → *terminada* (pasó el check-out) → *huésped en casa* (entre check-in y check-out) → *próxima*. Sin cron ni columna `status` que pueda desincronizarse.
+- **Solapamientos bloqueados en la BD**: restricción `EXCLUDE` sobre el rango de fechas por piso, más un `CHECK` de salida posterior a la llegada.
+- **Una sola zona horaria** (`America/Bogota`) para toda la app; todos los pisos están en Colombia. Si aparece un piso en otra zona, se añade la zona al piso.
+- **Huésped**: nombre, email, teléfono y nº de huéspedes. El teléfono se guarda pero no se usa hasta que haya un canal SMS/WhatsApp.
+- **Cancelación** con fecha (`cancelledAt`): las canceladas salen del tablero pero quedan en el historial.
+- **Notas en tabla propia** (`reservation_note`), para guardar un historial de incidencias.
+- **Migraciones registradas** con el migrador de Drizzle por HTTP; `0000` se marca como ya aplicada.
+- **Tests** de la lógica de estados y fechas con `node --test` (sin dependencias nuevas).
+
+### Tareas
+
+| # | Tarea | Historias |
+|---|---|---|
+| 1.1 | Migrador de Drizzle y marcar `0000` como aplicada | — |
+| 1.2 | Esquema: `property`, `reservation`, `reservation_note` + restricciones | 15, 18 |
+| 1.3 | Dominio: estado derivado de las fechas, con tests | 16 |
+| 1.4 | Casos de uso: crear/editar piso, crear/cancelar reserva, añadir nota, listar reservas | 14–18 |
+| 1.5 | Pantallas de pisos: lista, alta y edición | 18 |
+| 1.6 | Pantallas de reservas: alta y detalle con notas | 15, 17 |
+| 1.7 | Panel como tablero de llegadas: llegan hoy, en casa ahora, salen hoy, próximos 7 días | 14 |
+
+**Fuera de esta fase:** importar reservas desde el calendario iCal de Airbnb (barato de añadir después).
 
 **Hecho cuando:** el host puede dar de alta un piso, registrar una reserva y ver su estado en el panel, sin nada automatizado todavía.
 

@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "cross-env NODE_OPTIONS=--use-env-proxy next start",
     "lint": "eslint",
-    "db:check": "cross-env NODE_OPTIONS=--use-env-proxy node --env-file=.env.local scripts/check-db.mjs"
+    "check": "cross-env NODE_OPTIONS=--use-env-proxy node --env-file=.env.local scripts/check.mjs",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "cross-env NODE_OPTIONS=--use-env-proxy node --env-file=.env.local scripts/migrate.mjs"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",
