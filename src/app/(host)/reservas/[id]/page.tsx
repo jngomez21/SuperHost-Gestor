@@ -54,7 +54,11 @@ export default async function ReservationPage({ params }: PageProps<"/reservas/[
         <dl className="card-contact">
           <div>
             <dt>Email</dt>
-            <dd><a href={`mailto:${reservation.guestEmail}`}>{reservation.guestEmail}</a></dd>
+            <dd>
+              {reservation.guestEmail
+                ? <a href={`mailto:${reservation.guestEmail}`}>{reservation.guestEmail}</a>
+                : <span className="card-sub">Sin email</span>}
+            </dd>
           </div>
           <div>
             <dt>Teléfono</dt>

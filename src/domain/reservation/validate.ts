@@ -3,7 +3,7 @@ import { isDate, isEmail, isUuid, optionalText, text, type Raw, type Result } fr
 export type ReservationInput = {
   propertyId: string;
   guestName: string;
-  guestEmail: string;
+  guestEmail: string | null;
   guestPhone: string | null;
   guestCount: number;
   checkIn: string;
@@ -15,7 +15,7 @@ export function validateReservation(raw: Raw): Result<ReservationInput> {
   const value: ReservationInput = {
     propertyId: text(raw, "propertyId"),
     guestName: text(raw, "guestName"),
-    guestEmail: text(raw, "guestEmail").toLowerCase(),
+    guestEmail: optionalText(raw, "guestEmail")?.toLowerCase() ?? null,
     guestPhone: optionalText(raw, "guestPhone"),
     guestCount: count ? Number(count) : 1,
     checkIn: text(raw, "checkIn"),
@@ -25,7 +25,7 @@ export function validateReservation(raw: Raw): Result<ReservationInput> {
   const errors: Partial<Record<keyof ReservationInput, string>> = {};
   if (!isUuid(value.propertyId)) errors.propertyId = "Elige el piso.";
   if (!value.guestName) errors.guestName = "Escribe el nombre del huésped.";
-  if (!isEmail(value.guestEmail)) errors.guestEmail = "Escribe un email válido, como nombre@correo.com.";
+  if (value.guestEmail && !isEmail(value.guestEmail)) errors.guestEmail = "Escribe un email válido, como nombre@correo.com.";
   if (!Number.isInteger(value.guestCount) || value.guestCount < 1 || value.guestCount > 50) {
     errors.guestCount = "Pon un número de huéspedes entre 1 y 50.";
   }

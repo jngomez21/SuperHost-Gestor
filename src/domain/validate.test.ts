@@ -36,6 +36,12 @@ test("reserva válida: normaliza email y convierte huéspedes a número", () => 
   assert.equal(result.value.guestPhone, null);
 });
 
+test("reserva: el email es opcional porque Airbnb no lo comparte", () => {
+  const result = validateReservation({ ...reservation, guestEmail: "  " });
+  assert.ok(result.ok);
+  assert.equal(result.value.guestEmail, null);
+});
+
 test("reserva: la salida tiene que ser posterior a la llegada", () => {
   const same = validateReservation({ ...reservation, checkOut: "2026-10-10" });
   assert.ok(!same.ok);

@@ -55,7 +55,7 @@ export function ReservationForm({ properties, preselected }: { properties: Prope
           <input id="guestName" name="guestName" className="input" defaultValue={value("guestName")} autoComplete="off" />
         </Field>
         <div className="form-row">
-          <Field name="guestEmail" label="Email" hint="Aquí le llegarán los mensajes de llegada y salida." error={error("guestEmail")}>
+          <Field name="guestEmail" label="Email" hint="Opcional: Airbnb no lo comparte." error={error("guestEmail")}>
             <input id="guestEmail" name="guestEmail" type="email" className="input" defaultValue={value("guestEmail")} autoComplete="off" />
           </Field>
           <Field name="guestPhone" label="Teléfono" hint="Opcional." error={error("guestPhone")}>
