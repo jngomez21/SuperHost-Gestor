@@ -1,6 +1,22 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { preparation, STANDARD_TASKS, validateTaskLabel } from "./checklist.ts";
+import { pendingArrivals, preparation, STANDARD_TASKS, validateTaskLabel } from "./checklist.ts";
+
+test("por preparar: llegadas que aún no ocurren y no están listas", () => {
+  const preps = new Map([
+    ["lista", preparation([{ id: "a" }], ["a"])],
+    ["a-medias", preparation([{ id: "a" }, { id: "b" }], ["a"])],
+    ["sin-lista", preparation([], [])],
+    ["ya-llego", preparation([{ id: "a" }], [])],
+  ]);
+  const arrivals = [
+    { id: "lista", status: "upcoming" },
+    { id: "a-medias", status: "upcoming" },
+    { id: "sin-lista", status: "upcoming" },
+    { id: "ya-llego", status: "in_house" },
+  ];
+  assert.deepEqual(pendingArrivals(arrivals, preps).map((r) => r.id), ["a-medias", "sin-lista"]);
+});
 
 const tasks = [{ id: "sabanas" }, { id: "bano" }, { id: "basura" }];
 

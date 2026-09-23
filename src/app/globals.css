@@ -1511,3 +1511,113 @@ body {
   font-weight: 650;
   color: var(--brass-light);
 }
+
+/* ---------- Por preparar ---------- */
+
+.todo {
+  margin-top: 2.5rem;
+  max-width: 46rem;
+}
+
+.todo-done {
+  margin-top: 0.75rem;
+  color: var(--st-in_house);
+  font-weight: 650;
+}
+
+.todo-list {
+  margin-top: 1rem;
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.todo-row {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr) auto;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  border-radius: 0.9rem;
+  border: 2px solid var(--brass);
+  color: inherit;
+  text-decoration: none;
+}
+
+.todo-row:hover {
+  background: rgb(179 134 47 / 0.12);
+}
+
+.todo-day {
+  font-weight: 800;
+}
+
+.todo-progress {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+  font-weight: 650;
+}
+
+.todo-bar {
+  flex: 0 0 6rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.todo-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+}
+
+.todo-missing {
+  color: var(--st-cancelled);
+}
+
+.todo-cta {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  padding: 0.55rem 1rem;
+  border-radius: 0.7rem;
+  background: var(--brass);
+  color: #2a1d05;
+  font-weight: 700;
+}
+
+@media (max-width: 30rem) {
+  .todo-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .todo-day { grid-column: 1; }
+  .todo-row .ledger-guest,
+  .todo-progress { grid-column: 1; }
+  .todo-cta { grid-column: 2; grid-row: 1 / span 3; }
+}
+
+.slot-prep {
+  display: block;
+  margin-top: 0.75rem;
+  padding-top: 0.6rem;
+  border-top: 1px dashed rgb(42 29 5 / 0.35);
+  text-align: center;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.prep-chip {
+  margin-left: 0.5rem;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: rgb(179 134 47 / 0.2);
+  color: var(--fg);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.prep-chip-ok {
+  background: rgb(94 140 115 / 0.25);
+}

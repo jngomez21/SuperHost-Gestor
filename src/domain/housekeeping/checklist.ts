@@ -20,6 +20,13 @@ export function preparation(tasks: { id: string }[], checkedTaskIds: Iterable<st
   return { done, total, ready: total > 0 && done === total, hasChecklist: total > 0 };
 }
 
+export function pendingArrivals<R extends { id: string; status: string }>(
+  arrivals: R[],
+  preparations: Map<string, Preparation>
+): R[] {
+  return arrivals.filter((r) => r.status === "upcoming" && !preparations.get(r.id)?.ready);
+}
+
 export function validateTaskLabel(raw: Raw): Result<{ label: string }> {
   const label = text(raw, "label");
   if (!label) return { ok: false, errors: { label: "Escribe la tarea." } };
