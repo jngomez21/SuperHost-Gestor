@@ -473,8 +473,10 @@ body {
 }
 
 @media (max-width: 36rem) {
-  .topbar { flex-wrap: wrap; }
-  .wordmark { width: 100%; }
+  .topbar { flex-wrap: wrap; gap: 0.5rem 1rem; }
+  .wordmark { margin-right: auto; }
+  .topbar-nav { order: 3; width: 100%; margin-right: 0; }
+  .topbar .button { padding: 0.5rem 0.9rem; font-size: 0.95rem; }
 }
 
 /* ---------- Casillero vacío ---------- */
@@ -1328,4 +1330,184 @@ body {
 
 .link-button-danger {
   color: var(--bad);
+}
+
+/* ---------- Preparar una llegada ---------- */
+
+.prep-link {
+  margin-top: 2.5rem;
+  max-width: 44rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.prep {
+  max-width: 40rem;
+}
+
+.prep-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: 1rem -1.25rem 0;
+  padding: 1rem 1.25rem 0.9rem;
+  background: var(--bg);
+  border-bottom: 2px solid var(--line);
+}
+
+.prep-for {
+  color: var(--muted);
+}
+
+.prep-count {
+  margin-top: 0.25rem;
+  font-size: 1.15rem;
+}
+
+.prep-count strong {
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-stretch: 85%;
+}
+
+.prep-bar {
+  margin-top: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.prep-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--brass);
+  transition: width 0.3s ease;
+}
+
+.prep-sheet {
+  position: relative;
+  margin-top: 1.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.4rem;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 24px 40px -26px rgb(0 0 0 / 0.6);
+}
+
+.prep-list {
+  list-style: none;
+  padding: 0;
+}
+
+.prep-list li + li {
+  border-top: 2px dotted rgb(31 42 68 / 0.3);
+}
+
+.prep-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.15rem 1rem;
+  align-items: center;
+  min-height: 3.75rem;
+  padding: 0.75rem 0.25rem;
+  cursor: pointer;
+}
+
+.prep-input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+.prep-input:disabled {
+  cursor: not-allowed;
+}
+
+.prep-box {
+  grid-row: span 2;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 2.5px solid var(--ink);
+  border-radius: 0.45rem;
+  display: grid;
+  place-items: center;
+}
+
+.prep-input:checked + .prep-box {
+  background: var(--ink);
+}
+
+.prep-input:checked + .prep-box::after {
+  content: "";
+  width: 0.55rem;
+  height: 1rem;
+  margin-top: -0.2rem;
+  border: solid var(--paper);
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+.prep-input:focus-visible + .prep-box {
+  outline: 3px solid var(--brass);
+  outline-offset: 3px;
+}
+
+.prep-label {
+  font-size: 1.1rem;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.prep-row-done .prep-label {
+  color: #5b6477;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.prep-time {
+  grid-column: 2;
+  font-size: 0.85rem;
+  color: #5b6477;
+}
+
+.prep-stamp {
+  display: block;
+  width: fit-content;
+  margin: 0.9rem 0.25rem 1rem auto;
+  padding: 0.35rem 1rem;
+  border: 3px solid #2f5a42;
+  border-radius: 0.5rem;
+  color: #2f5a42;
+  background: rgb(243 245 242 / 0.9);
+  font-weight: 800;
+  font-size: 1.15rem;
+  transform: rotate(-8deg);
+  animation: stamp 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+  pointer-events: none;
+}
+
+@keyframes stamp {
+  0% { transform: rotate(-8deg) scale(2.2); opacity: 0; }
+  100% { transform: rotate(-8deg) scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prep-stamp { animation: none; }
+  .prep-bar-fill { transition: none; }
+}
+
+.prep-saving {
+  margin-left: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: var(--brass-light);
 }

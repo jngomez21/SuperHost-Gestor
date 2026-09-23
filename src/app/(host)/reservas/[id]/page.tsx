@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getReservation } from "@/application/reservations";
+import { getPreparation } from "@/application/housekeeping";
 import { requireHost } from "@/app/_lib/host";
 import { formatDate, formatDateTime, formatTime, STATUS_LABEL } from "@/app/_lib/format";
 import { nights } from "@/domain/reservation/status";
@@ -10,9 +10,10 @@ import { NoteForm } from "./note-form";
 export default async function ReservationPage({ params }: PageProps<"/reservas/[id]">) {
   const host = await requireHost();
   const { id } = await params;
-  const reservation = await getReservation(host.id, id);
-  if (!reservation) notFound();
+  const prep = await getPreparation(host.id, id);
+  if (!prep) notFound();
 
+  const { reservation, progress } = prep;
   const { property, status } = reservation;
   const count = nights(reservation.checkIn, reservation.checkOut);
   const cancellable = status === "upcoming" || status === "in_house";
@@ -65,6 +66,24 @@ export default async function ReservationPage({ params }: PageProps<"/reservas/[
           </div>
         </dl>
       </article>
+
+      {status !== "cancelled" && (
+        <section className="prep-link" aria-labelledby="prep-title">
+          <div>
+            <h2 id="prep-title" className="section-title">Preparación del piso</h2>
+            <p className="panel-lead">
+              {!progress.hasChecklist
+                ? "Este piso no tiene lista de preparación."
+                : progress.ready
+                  ? `Todo listo: ${progress.total} de ${progress.total} tareas hechas.`
+                  : `${progress.done} de ${progress.total} tareas hechas.`}
+            </p>
+          </div>
+          <Link href={`/reservas/${reservation.id}/preparar`} className="button">
+            {status === "upcoming" ? "Preparar la llegada" : "Ver la preparación"}
+          </Link>
+        </section>
+      )}
 
       <section className="log" aria-labelledby="log-title">
         <h2 id="log-title" className="section-title">Bitácora</h2>

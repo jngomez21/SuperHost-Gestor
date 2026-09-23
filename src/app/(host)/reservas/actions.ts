@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { addNote, cancelReservation, createReservation } from "@/application/reservations";
+import { setTaskDone } from "@/application/housekeeping";
 import { requireHost } from "@/app/_lib/host";
 
 export type FormState = {
@@ -35,4 +36,12 @@ export async function cancelReservationAction(reservationId: string) {
   await cancelReservation(host.id, reservationId);
   revalidatePath(`/reservas/${reservationId}`);
   revalidatePath("/reservas");
+}
+
+export async function toggleTaskAction(reservationId: string, taskId: string, done: boolean) {
+  const host = await requireHost();
+  await setTaskDone(host.id, reservationId, taskId, done);
+  revalidatePath(`/reservas/${reservationId}/preparar`);
+  revalidatePath(`/reservas/${reservationId}`);
+  revalidatePath("/panel");
 }
