@@ -20,6 +20,7 @@ export default async function HostLayout({ children }: LayoutProps<"/">) {
             <NavLink href="/reservas">Reservas</NavLink>
             <NavLink href="/pisos">Pisos</NavLink>
             <NavLink href="/mensajes">Mensajes</NavLink>
+            <NavLink href="/guia">Guía</NavLink>
           </nav>
           <div className="topbar-tools">
             <Preferences />

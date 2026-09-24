@@ -5,6 +5,7 @@ import { isUuid, type Raw } from "@/domain/fields";
 import { firstName, guestView } from "@/domain/reservation/guest";
 import { reservationStatus } from "@/domain/reservation/status";
 import { validateNote, validateReservation } from "@/domain/reservation/validate";
+import { loadGuide } from "./guide";
 import { messagesToSchedule } from "./messaging";
 import { getProperty, ownedPropertyIds } from "./properties";
 
@@ -100,24 +101,20 @@ export async function cancelReservation(hostId: string, id: string) {
   return rows.length > 0;
 }
 
-// Lo que ve el huésped con su enlace. Solo se leen los datos de su estancia y los del piso
-// para llegar: nunca notas, contacto ni otras reservas. Tras la salida, ni siquiera el acceso.
+// Lo que ve el huésped con su enlace: su estancia y la guía del piso. Nunca notas, contacto
+// ni otras reservas. Tras la salida, solo su nombre y la portada para el agradecimiento.
 export async function getGuestStay(token: string, now = new Date()) {
   if (!isUuid(token)) return null;
   const r = reservationTable;
   const p = propertyTable;
   const [row] = await db
     .select({
+      propertyId: r.propertyId,
       guestName: r.guestName,
       guestCount: r.guestCount,
       checkIn: r.checkIn,
       checkOut: r.checkOut,
       cancelledAt: r.cancelledAt,
-      propertyName: p.name,
-      address: p.address,
-      accessInstructions: p.accessInstructions,
-      wifiName: p.wifiName,
-      wifiPassword: p.wifiPassword,
       checkInTime: p.checkInTime,
       checkOutTime: p.checkOutTime,
     })
@@ -128,21 +125,12 @@ export async function getGuestStay(token: string, now = new Date()) {
 
   const view = guestView(row, row, now);
   if (!view) return null;
-  const guest = { firstName: firstName(row.guestName), propertyName: row.propertyName };
-  if (view === "thanks") return { view, ...guest };
-  return {
-    view,
-    ...guest,
-    guestCount: row.guestCount,
-    checkIn: row.checkIn,
-    checkOut: row.checkOut,
-    address: row.address,
-    accessInstructions: row.accessInstructions,
-    wifiName: row.wifiName,
-    wifiPassword: row.wifiPassword,
-    checkInTime: row.checkInTime,
-    checkOutTime: row.checkOutTime,
-  };
+  const guide = (await loadGuide(row.propertyId))!;
+  const stay = { firstName: firstName(row.guestName), guestCount: row.guestCount, checkIn: row.checkIn, checkOut: row.checkOut };
+  if (view === "thanks") {
+    return { view, firstName: stay.firstName, propertyName: guide.property.name, coverUrl: guide.photos[0]?.url ?? null };
+  }
+  return { view, stay, guide };
 }
 
 // Un token nuevo para la reserva: el enlace anterior deja de funcionar al instante (ADR-007).

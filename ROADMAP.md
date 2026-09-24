@@ -149,7 +149,15 @@ Historia 13 (aviso si la checklist no está lista antes del check-in) va aquí a
 
 ## Fase 5 — Enlace del huésped
 
-**Avance:** hechas la 5.1 a la 5.5 y la 5.8. La 5.6 y la 5.7 tienen una versión provisional mínima (datos de la estancia; agradecimiento con la reseña) a la espera del contenido y el diseño que defina el host. **Para activarla en producción**: `npm run db:migrate` (migración `0006`) antes de desplegar, y añadir `{enlace}` a la Bienvenida ya guardada en `/mensajes`. El enlace usa `APP_URL` si está definida y, si no, el dominio de producción que da Vercel.
+**Avance:** hechas de la 5.1 a la 5.15. La 5.6 y la 5.7 quedan cubiertas por la guía del huésped (5.9-5.15). Falta la prueba del enlace en un chat real de Airbnb para cerrar la fase.
+
+**Para activarla en producción**, en este orden:
+1. `npm run db:migrate` (migraciones `0006` y `0007`) **antes** de desplegar: el código nuevo lee las columnas de la guía.
+2. `npm run cargar:bosque`: borra los pisos de prueba con sus reservas y crea Bosque apartment.
+3. En Vercel, Storage → crear un Blob store **público** y conectarlo al proyecto (crea `BLOB_READ_WRITE_TOKEN`); sin él, todo funciona salvo subir fotos.
+4. Desplegar, y añadir `{enlace}` a la Bienvenida ya guardada en `/mensajes`.
+
+El enlace usa `APP_URL` si está definida y, si no, el dominio de producción que da Vercel.
 
 Sin historias en `SPEC.md`: nace después del plan original. En vez de repartir la información de la estancia entre varios mensajes, la bienvenida lleva un enlace a una página personal del huésped con todo lo que necesita. Depende de la Fase 1 (reserva y piso) y de la Fase 3 (la bienvenida que lleva el enlace). El token pertenece a la reserva, así que vive en el módulo `reservation`; la página queda fuera del área del host y no pide login.
 
@@ -182,6 +190,28 @@ Sin historias en `SPEC.md`: nace después del plan original. En vez de repartir 
 | 5.8 | `npm run check`: un token inventado da 404 en producción | — |
 
 Cada pantalla se revisa en móvil y en modo claro al construirla.
+
+### Guía del huésped (contenido de la 5.6 y la 5.7)
+
+Definido por el host después de ver las vistas provisionales: la página del huésped es una guía completa del piso, con la estética de la app, y el host la edita desde una pantalla propia.
+
+- **La guía es del piso**, no de la reserva: lo que el host guarda la ven todos los huéspedes de ese piso; cada uno con su saludo, sus fechas y su enlace.
+- **Contenido**: fotos (con portada), mapa con la ubicación exacta, internet y clave, canales de TV, cómo llegar y cómo entrar, normas de la casa, cómo funciona la casa, qué hay en el apartamento, basura y reciclaje, antes de irte, emergencias, transporte y lugares de interés cercanos (con "Cómo llegar" en Google Maps).
+- **Mapa**: OpenStreetMap incrustado (sin claves ni coste) y botón para abrir la ubicación en Google Maps. El host da la ubicación con coordenadas o pegando un enlace de Google Maps.
+- **Fotos en Vercel Blob** (ADR-008). Se comprimen en el navegador antes de subir (lado largo de 1600 px) y suben de una en una; la primera es la portada.
+- **Agradecimiento llamativo**: portada del piso, estrellas que caen y los pasos para dejar la reseña desde la app de Airbnb, con botón que la abre.
+- **Pantalla del host "Guía"** en la navegación: un piso por tecla y, dentro, el editor por secciones con vista previa de lo que ve el huésped.
+- **Datos iniciales reales**: se borran los pisos de prueba (y con ellos sus reservas) y se crea **Bosque apartment** (Bosque Central, piso 1, apto 111, El Bosque, Floridablanca) con lugares cercanos reales de OpenStreetMap. Internet, TV y normas van inventados hasta que el host los corrija.
+
+| # | Tarea | Historias |
+|---|---|---|
+| 5.9 | ADR-008: fotos en Vercel Blob | — |
+| 5.10 | Esquema: campos de la guía en el piso, fotos y lugares cercanos, con migración | — |
+| 5.11 | Dominio: ubicación a partir de coordenadas o enlace de Google Maps, listas por líneas y validación de la guía, con tests | — |
+| 5.12 | Casos de uso: guía del piso, fotos (subir, ordenar, portada, quitar) y lugares (añadir, quitar) | — |
+| 5.13 | Pantalla del host "Guía": editor por secciones y vista previa | — |
+| 5.14 | Vista del huésped con la guía completa y agradecimiento llamativo | — |
+| 5.15 | Script de carga: borra los pisos de prueba y crea Bosque apartment | — |
 
 **Antes de empezar:** mandar un enlace de prueba en una conversación real de Airbnb para confirmar que el chat no lo oculta ni lo marca.
 
@@ -232,4 +262,8 @@ Todo el frontend se rehízo tomando como referencia la estética, las animacione
 | `/mensajes/nueva` | Nueva plantilla | Nombre, texto con teclas para insertar variables y cuándo toca (al registrar, o día y hora respecto a la llegada o la salida). Al lado, la vista previa como globo de chat con una reserva de ejemplo y los datos de un piso, el momento del aviso y qué datos faltan en el piso. |
 | `/mensajes/[id]` | Editar plantilla | El mismo formulario, avisando de que el horario vale para reservas nuevas y el texto también para las ya programadas; quitar en dos pasos. |
 | `/estado` | Estado del sistema | Acceso, base de datos, correo y avisos comprobados en el momento (los avisos, preguntando a QStash si el horario existe y corre); métricas de los últimos 30 días (tiempo de respuesta, mediana y el más lento, y llegadas con el piso sin terminar), y el avance por fases. |
+| `/guia` | La guía del huésped | Una tecla por piso para editar su guía. |
+| `/guia/[id]` | Editar la guía | Fotos (subir, portada, ordenar, quitar), la información por secciones (ubicación, wifi y TV, llegar y entrar, la casa, salida, ayuda) y los lugares cercanos; botón "Ver como huésped". |
+| `/vista-previa/[id]` | Vista previa | La guía como la ve un huésped de ejemplo, solo para el host. |
+| `/estancia/[token]` | Guía del huésped (pública) | Saludo y cifras de la estancia, portada, atajos a cada sección, galería, wifi con clave para copiar, TV, mapa de OpenStreetMap y botón a Google Maps, normas, cómo funciona la casa, qué hay, basura, lugares cercanos por tipo con "Cómo llegar", "Antes de irte", transporte y emergencias (llamar al 123). Tras la salida, agradecimiento con estrellas, la portada en polaroid y los pasos para dejar la reseña en la app de Airbnb. Enlace que no vale: 404 propio. |
 | cualquier otra | 404 | "Esta llave no abre ninguna puerta", con vuelta al panel. |

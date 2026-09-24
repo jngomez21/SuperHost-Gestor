@@ -18,6 +18,7 @@ export default async function EditPropertyPage({ params }: PageProps<"/pisos/[id
       <p><Link href="/pisos" className="back-link">Tus pisos</Link></p>
       <h1 className="page-title">{property.name}</h1>
       <p className="page-lead">{property.address}</p>
+      <p className="guest-actions"><Link href={`/guia/${property.id}`} className="button button-quiet">Editar la guía del huésped</Link></p>
       <PropertyForm id={property.id} initial={property} />
       <TaskEditor propertyId={property.id} tasks={tasks.map(({ id, label }) => ({ id, label }))} />
     </main>

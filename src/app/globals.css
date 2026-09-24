@@ -330,14 +330,14 @@ svg[aria-hidden="true"] {
   .topbar { gap: 0.6rem 0.75rem; padding: 0.65rem 1.25rem 0.8rem; clip-path: polygon(0 0, 100% 0, calc(100% - 0.8rem) 100%, 0.8rem 100%); }
   .topbar-home { margin-right: auto; }
   .topbar .wordmark { font-size: 1.05rem; }
-  .topbar-nav { order: 3; width: 100%; margin-right: 0; }
-  .navkey { flex: 1; text-align: center; padding-inline: 0.5rem; }
+  .topbar-nav { order: 3; width: 100%; margin-right: 0; gap: 0.4rem; }
+  .navkey { flex: 1 1 auto; text-align: center; padding-inline: 0.35rem; font-size: 0.95rem; }
 }
 
-/* Cuatro teclas en 320 px. */
+/* Cinco teclas en 320 px. */
 @media (max-width: 23.99rem) {
-  .topbar-nav { gap: 0.35rem; }
-  .navkey { padding-inline: 0.3rem; font-size: 0.88rem; }
+  .topbar-nav { gap: 0.25rem; }
+  .navkey { padding-inline: 0.2rem; font-size: 0.8rem; }
 }
 
 /* ---------- Logo: letras con relieve que saltan ---------- */
@@ -1691,3 +1691,308 @@ mark.preview-missing { background: none; }
 }
 
 .entry-card .button { margin-top: 0.6rem; }
+
+/* ---------- Guía del huésped (/estancia) ---------- */
+
+.guest-topbar { justify-content: space-between; }
+.guest { max-width: 64rem; }
+
+.guest-hero {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (min-width: 56rem) {
+  .guest-hero { grid-template-columns: minmax(0, 1fr) 24rem; }
+}
+
+.guest-stats { grid-template-columns: repeat(2, auto); }
+.guest-stat-date { font-size: 1.35rem; }
+
+@media (max-width: 40rem) {
+  .guest-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem 1rem; padding-inline: 1rem; }
+  /* La fecha no se parte ("mar, 29 de sept"): cabe encogiendo la letra en pantallas estrechas. */
+  .guest-stat-date { font-size: clamp(1rem, 4.6vw, 1.35rem); }
+}
+
+/* Portada con el marco en degradado de la ficha. */
+.guest-cover {
+  overflow: hidden;
+  border: 3px solid transparent;
+  border-radius: 1.25rem;
+  background: var(--frame) 0 0 / 300% 300% border-box;
+  box-shadow: 0 24px 36px -24px rgb(0 0 0 / 0.8);
+  rotate: 1.5deg;
+  animation: flowing 12s linear infinite;
+}
+
+.guest-cover img,
+.polaroid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+/* Atajos a cada sección: las mismas teclas de la navegación. */
+.guest-keys {
+  margin-top: 2.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.guest-section { scroll-margin-top: 1.25rem; }
+.guest-note { margin-top: 0.75rem; }
+
+.guest-gallery {
+  margin-top: 0.5rem;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(80%, 22rem);
+  gap: 0.9rem;
+  overflow-x: auto;
+  padding: 0.25rem 0.25rem 1rem;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+}
+
+.guest-gallery li { scroll-snap-align: start; }
+
+.guest-gallery a {
+  display: block;
+  overflow: hidden;
+  border-radius: 0.95rem;
+  box-shadow: 0 14px 22px -16px rgb(0 0 0 / 0.7);
+}
+
+.guest-gallery img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: scale 0.3s;
+}
+
+.guest-gallery a:hover img { scale: 1.04; }
+
+/* Wifi: una tecla grande con la clave para copiar. */
+.guest-wifi {
+  margin-top: 1.25rem;
+  display: grid;
+  gap: 0.9rem;
+  width: min(100%, 34rem);
+  padding: 1.2rem 1.3rem 1.35rem;
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow: 0 6px 0 var(--key-deep), var(--key-shadow);
+}
+
+.guest-wifi p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.85rem;
+}
+
+.guest-label {
+  width: 100%;
+  color: var(--muted);
+  font: 600 0.82rem var(--font-ui);
+  letter-spacing: 0.02em;
+}
+
+.guest-secret {
+  font: 700 clamp(1.35rem, 5vw, 1.7rem)/1.15 var(--font-ui);
+  overflow-wrap: anywhere;
+}
+
+.guest-blocks {
+  margin-top: 1.25rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: 0.85rem;
+}
+
+.guest-block {
+  padding: 1.1rem 1.2rem 1.2rem;
+  border: 1px solid var(--edge);
+  border-radius: 0.95rem;
+  background: var(--surface-3);
+}
+
+.guest-block-title { font: 700 1.1rem var(--font-ui); }
+.guest-text { margin-top: 0.45rem; white-space: pre-line; overflow-wrap: anywhere; }
+.guest-list { margin-top: 0.85rem; gap: 0.7rem; }
+.guest-actions { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+.guest-tags {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.guest-tags .chip { --chip: var(--st-upcoming); white-space: normal; }
+
+.guest-map {
+  margin-top: 1.25rem;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 1.1rem;
+  background: var(--frame) 0 0 / 300% 300% border-box;
+  box-shadow: 0 20px 34px -24px rgb(0 0 0 / 0.75);
+}
+
+.guest-map iframe {
+  display: block;
+  width: 100%;
+  height: clamp(16rem, 55vw, 24rem);
+  border: 0;
+}
+
+.guest-group { margin-top: 1.5rem; }
+
+.guest-places {
+  margin-top: 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: 0.75rem;
+}
+
+.guest-place {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 1rem 1.1rem 1.1rem;
+  border: 1px solid var(--edge);
+  border-radius: 0.95rem;
+  background: var(--surface);
+}
+
+.guest-place-name { font: 700 1.05rem/1.25 var(--font-ui); overflow-wrap: anywhere; }
+.guest-place-distance { color: var(--st-upcoming); font: 600 0.9rem var(--font-ui); }
+.guest-place-note { color: var(--muted); font-size: 0.92rem; }
+.guest-place .button { margin-top: auto; }
+.guest-place .guest-place-note + .button,
+.guest-place .guest-place-distance + .button { margin-top: 0.6rem; }
+
+.guest-check { grid-template-columns: auto minmax(0, 1fr); }
+.guest-sign { margin-top: 2rem; }
+
+/* ---------- Agradecimiento tras la salida ---------- */
+
+@keyframes star-fall {
+  from { opacity: 0; translate: 0 -3rem; rotate: -40deg; scale: 0.4; }
+  70% { opacity: 1; translate: 0 0.3rem; rotate: 8deg; scale: 1.15; }
+}
+
+.guest-thanks { gap: 0; }
+
+.thanks-stars {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  color: var(--task);
+  font: 700 clamp(2.4rem, 11vw, 3.6rem)/1 var(--font-ui);
+  text-shadow: 0 3px 0 var(--task-deep);
+}
+
+.thanks-stars span { animation: star-fall 0.7s cubic-bezier(0.2, 1.4, 0.45, 1) both; }
+
+.polaroid {
+  margin-top: 2rem;
+  width: min(100%, 20rem);
+  padding: 0.75rem 0.75rem 0.4rem;
+  background: #fff;
+  box-shadow: 0 22px 34px -22px rgb(0 0 0 / 0.8);
+  rotate: -3deg;
+  animation: drop-in 0.6s 0.5s cubic-bezier(0.2, 1.4, 0.45, 1) both;
+}
+
+.polaroid .hand {
+  display: block;
+  padding: 0.5rem 0 0.2rem;
+  color: #b3202a;
+  rotate: 0deg;
+}
+
+.thanks-steps {
+  margin-top: 0;
+  width: min(100%, 26rem);
+  text-align: left;
+}
+
+.roadmap.thanks-steps > li::before { border-color: var(--action); }
+
+/* ---------- Editor de la guía (host) ---------- */
+
+.guide-preview-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.photo-upload {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+}
+
+.photo-upload label:has(input:disabled) { cursor: progress; opacity: 0.75; }
+.photo-upload label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+.photo-grid {
+  margin-top: 1.25rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
+  gap: 1rem;
+}
+
+.photo-item {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--edge);
+  border-radius: 0.95rem;
+  background: var(--surface);
+}
+
+.photo-item img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.photo-cover { position: absolute; top: 0.6rem; left: 0.6rem; background: var(--surface); }
+
+.photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 0.25rem 0.35rem;
+}
+
+.place-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.85rem 1.2rem;
+}
+
+.preview-banner {
+  padding: 0.6rem 1.25rem;
+  background: var(--task);
+  color: var(--task-ink);
+  font: 600 0.95rem var(--font-ui);
+  text-align: center;
+}
+
+.preview-banner a { color: inherit; text-underline-offset: 3px; }

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { check, date, integer, pgEnum, pgTable, primaryKey, text, time, timestamp, uuid } from "drizzle-orm/pg-core";
+import { check, date, doublePrecision, integer, pgEnum, pgTable, primaryKey, text, time, timestamp, uuid } from "drizzle-orm/pg-core";
 import { usersTable } from "./auth-schema";
 
 export const propertyTable = pgTable("property", {
@@ -14,6 +14,44 @@ export const propertyTable = pgTable("property", {
   accessInstructions: text("access_instructions"),
   checkInTime: time("check_in_time").notNull().default("15:00"),
   checkOutTime: time("check_out_time").notNull().default("11:00"),
+  // Guía del huésped (Fase 5): lo que ven todos los huéspedes del piso. Las listas van una por línea.
+  latitude: doublePrecision("latitude"),
+  longitude: doublePrecision("longitude"),
+  arrivalInfo: text("arrival_info"),
+  tvInfo: text("tv_info"),
+  houseRules: text("house_rules"),
+  houseGuide: text("house_guide"),
+  amenities: text("amenities"),
+  trashInfo: text("trash_info"),
+  checkoutList: text("checkout_list"),
+  emergencyInfo: text("emergency_info"),
+  transportInfo: text("transport_info"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Fotos de la guía, en Vercel Blob (ADR-008). La de menor posición es la portada.
+export const propertyPhotoTable = pgTable("property_photo", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  propertyId: uuid("property_id")
+    .notNull()
+    .references(() => propertyTable.id, { onDelete: "cascade" }),
+  url: text("url").notNull(),
+  position: integer("position").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Lugares de interés cercanos. `mapsQuery` es lo que se busca en Google Maps para "Cómo llegar".
+export const propertyPlaceTable = pgTable("property_place", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  propertyId: uuid("property_id")
+    .notNull()
+    .references(() => propertyTable.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  category: text("category").notNull(),
+  distance: text("distance"),
+  note: text("note"),
+  mapsQuery: text("maps_query"),
+  position: integer("position").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

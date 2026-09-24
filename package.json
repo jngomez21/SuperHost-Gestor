@@ -12,12 +12,14 @@
     "check": "cross-env NODE_OPTIONS=--use-env-proxy node --env-file=.env.local scripts/check.mjs",
     "schedule": "cross-env NODE_OPTIONS=--use-env-proxy node --env-file=.env.local scripts/schedule.mjs",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "cross-env NODE_OPTIONS=--use-env-proxy node --env-file=.env.local scripts/migrate.mjs"
+    "db:migrate": "cross-env NODE_OPTIONS=--use-env-proxy node --env-file=.env.local scripts/migrate.mjs",
+    "cargar:bosque": "cross-env NODE_OPTIONS=--use-env-proxy node --env-file=.env.local scripts/cargar-bosque.mjs"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",
     "@neondatabase/serverless": "^1.1.0",
     "@upstash/qstash": "^2.11.3",
+    "@vercel/blob": "^2.8.0",
     "drizzle-orm": "^0.45.3",
     "next": "16.3.6",
     "next-auth": "^5.0.0-beta.32",

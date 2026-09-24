@@ -115,6 +115,7 @@ Ver `docs/adr/`:
 - [ADR-005](docs/adr/0005-proveedor-hosting-datos.md) — Neon+Auth.js vs. Supabase vs. PocketBase autoalojado
 - [ADR-006](docs/adr/0006-canal-de-mensajes.md) — Copiar y pegar en Airbnb vs. email directo al huésped
 - [ADR-007](docs/adr/0007-enlace-del-huesped.md) — Enlace por reserva con token vs. cuenta del huésped o enlace por piso
+- [ADR-008](docs/adr/0008-fotos-en-vercel-blob.md) — Fotos de los pisos en Vercel Blob vs. BD, Cloudinary, R2/S3 o enlaces externos
 
 ## Riesgos y límites conocidos
 
