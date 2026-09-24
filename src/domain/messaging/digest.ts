@@ -10,6 +10,15 @@ type Item = {
   property: { name: string };
 };
 
+type Arrival = {
+  id: string;
+  guestName: string;
+  propertyId: string;
+  propertyName: string;
+  arrival: Date;
+  preparation: { done: number; total: number; hasChecklist: boolean };
+};
+
 const moment = new Intl.DateTimeFormat("es-CO", {
   weekday: "long",
   day: "numeric",
@@ -19,21 +28,36 @@ const moment = new Intl.DateTimeFormat("es-CO", {
   timeZone: "America/Bogota",
 });
 
-// Email-resumen al host: texto plano, para copiar cada mensaje tal cual al chat de Airbnb.
-export function digestEmail(notify: Item[], remind: Item[], origin: string): { subject: string; text: string } {
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
+// Email-resumen al host: texto plano, para copiar cada mensaje tal cual al chat de Airbnb,
+// seguido de las llegadas con el piso sin preparar.
+export function digestEmail(
+  notify: Item[],
+  remind: Item[],
+  origin: string,
+  arrivals: Arrival[] = []
+): { subject: string; text: string } {
   const items = [...notify.map((m) => ({ m, late: false })), ...remind.map((m) => ({ m, late: true }))];
   const [only] = items;
   const subject =
-    items.length === 1
-      ? `${only.late ? "Sigue sin enviar" : "Por enviar"}: ${only.m.name} para ${only.m.reservation.guestName}`
-      : `${items.length} mensajes por enviar`;
+    items.length + arrivals.length > 1
+      ? [
+          items.length && plural(items.length, "mensaje por enviar", "mensajes por enviar"),
+          arrivals.length && plural(arrivals.length, "piso por preparar", "pisos por preparar"),
+        ].filter(Boolean).join(" y ")
+      : only
+        ? `${only.late ? "Sigue sin enviar" : "Por enviar"}: ${only.m.name} para ${only.m.reservation.guestName}`
+        : `Por preparar: ${arrivals[0].propertyName} para ${arrivals[0].guestName}`;
 
-  const intro =
-    items.length === 1
-      ? "Toca pegar este mensaje en el chat de Airbnb. Cuando lo hagas, márcalo como enviado en el gestor."
-      : `Toca pegar estos ${items.length} mensajes en el chat de Airbnb. Cuando lo hagas, márcalos como enviados en el gestor.`;
+  const intro = [
+    items.length === 1 && "Toca pegar este mensaje en el chat de Airbnb. Cuando lo hagas, márcalo como enviado en el gestor.",
+    items.length > 1 &&
+      `Toca pegar estos ${items.length} mensajes en el chat de Airbnb. Cuando lo hagas, márcalos como enviados en el gestor.`,
+    arrivals.length && `${arrivals.length === 1 ? "Una llegada tiene" : `${arrivals.length} llegadas tienen`} el piso sin preparar.`,
+  ].filter(Boolean).join("\n");
 
-  const blocks = items.map(({ m, late }) =>
+  const messageBlocks = items.map(({ m, late }) =>
     [
       `${late ? "RECORDATORIO · " : ""}${m.name} para ${m.reservation.guestName} (${m.property.name})`,
       `Toca desde el ${moment.format(m.sendAt)}${late ? " y sigue sin enviar" : ""}.`,
@@ -45,5 +69,14 @@ export function digestEmail(notify: Item[], remind: Item[], origin: string): { s
     ].join("\n")
   );
 
-  return { subject, text: [intro, ...blocks].join("\n\n————————————\n\n") };
+  const arrivalBlocks = arrivals.map((a) => {
+    const { done, total, hasChecklist } = a.preparation;
+    return [
+      `PREPARAR · ${a.propertyName} para ${a.guestName}`,
+      `Llega el ${moment.format(a.arrival)} y ${hasChecklist ? `van ${done} de ${total} tareas` : "el piso no tiene lista de preparación"}.`,
+      hasChecklist ? `Preparar: ${origin}/reservas/${a.id}/preparar` : `Crear la lista: ${origin}/pisos/${a.propertyId}`,
+    ].join("\n");
+  });
+
+  return { subject, text: [intro, ...messageBlocks, ...arrivalBlocks].join("\n\n————————————\n\n") };
 }

@@ -83,7 +83,7 @@ Historias 9, 10, 11, 12. Depende solo de la Fase 1. Va antes que mensajería por
 
 ## Fase 3 — Mensajería automática ✅ Hecha
 
-Cambios respecto al plan: las plantillas tienen sección propia (`/mensajes`) en la navegación. El email-resumen va en texto plano, para copiar cada mensaje tal cual, y enlaza a cada uno en la ficha de la reserva. El horario de QStash se crea con `npm run schedule` (id fijo `dispatch`: volver a ejecutarlo lo actualiza), y `npm run check` comprueba que el despachador exige firma. Al rellenar, un dato que acaba en punto ya no deja dos seguidos ("p. m.."). **Para activarla en producción**: desplegar y ejecutar `npm run schedule` una vez.
+Cambios respecto al plan: las plantillas tienen sección propia (`/mensajes`) en la navegación. El email-resumen va en texto plano, para copiar cada mensaje tal cual, y enlaza a cada uno en la ficha de la reserva. El horario de QStash se crea con `npm run schedule` (id fijo `dispatch`: volver a ejecutarlo lo actualiza), y `npm run check` comprueba que el despachador exige firma. Al rellenar, un dato que acaba en punto ya no deja dos seguidos ("p. m.."). **Para activarla en producción**: desplegar y ejecutar `npm run schedule` una vez. La cuenta de QStash está en `us-east-1`, así que `QSTASH_URL=https://qstash-us-east-1.upstash.io` tiene que estar en `.env.local` y en Vercel; sin ella el cliente va a la región por defecto y no encuentra la cuenta.
 
 Historias 1-8 y 19. La pieza que protege directamente las métricas de Superhost (tasa de respuesta). Es la más compleja: plantillas + variables + integración con QStash y Resend — se deja para después de validar Fases 1-2 con el modelo de reserva ya probado.
 
@@ -124,6 +124,26 @@ Historia 13 (aviso si la checklist no está lista antes del check-in) va aquí a
 - Aviso al host cuando una reserva está por empezar y la checklist no está completa.
 - Ajustes de UX basados en el primer uso real.
 - Primeras métricas: tiempo de respuesta, incidencias, estado general del sistema en producción.
+
+### Decisiones
+
+- **El aviso llega cuando ya se puede preparar el piso**: 24 h antes de la hora de llegada o, si el huésped anterior del mismo piso sale más tarde, a la hora de su salida. Con cambio de huésped el mismo día (sale Ana a las 11:00, llega Pedro a las 15:00) el aviso llega a las 11:00; con el piso vacío el día antes, 24 h antes. Una reserva registrada con menos margen se avisa en el siguiente despacho.
+- **Solo si hace falta y una sola vez**: si la lista no está completa (o el piso no tiene lista) en ese momento. Se guarda cuándo se avisó (`prep_warned_at` en la reserva), con el mismo marcar-antes-de-enviar que los mensajes.
+- **Por el mismo email-resumen** del despachador, junto a los mensajes por enviar, con enlace a la pantalla de preparar. El panel ya muestra "Por preparar esta semana".
+- **Métricas en `/estado`**, calculadas de lo que ya se guarda:
+  - *Tiempo de respuesta*: de que un mensaje toca a que se marca enviado, mediana y el más lento de los últimos 30 días. Mide lo que el host declara, no la entrega en Airbnb.
+  - *Llegadas con el piso sin terminar*: la hora de llegada pasó sin la lista completa (cada tarea marcada guarda su hora).
+  - *Despachador activo*: `/estado` pregunta a QStash si el horario de 5 min existe y no está pausado, en vez de mirar solo que haya clave.
+
+### Tareas
+
+| # | Tarea | Historias |
+|---|---|---|
+| 4.1 | Esquema: `prep_warned_at` en la reserva, con migración | 13 |
+| 4.2 | Dominio: momento del aviso (24 h antes o salida del anterior) y a quién avisar, con tests | 13 |
+| 4.3 | Despachador: aviso de preparación en el email-resumen, una vez por llegada | 13 |
+| 4.4 | Métricas en `/estado`: tiempo de respuesta, llegadas sin terminar y despachador activo | — |
+| 4.5 | Uso real: una reserva completa con un host real y los ajustes que salgan | — |
 
 **Hecho cuando:** un host real usa el sistema en una reserva completa (check-in a check-out) sin intervención manual fuera de lo que el diseño ya prevé.
 
@@ -171,5 +191,5 @@ Todo el frontend se rehízo tomando como referencia la estética, las animacione
 | `/mensajes` | Tus plantillas | Recorrido de las plantillas en el orden en que se envían, con su momento y el texto con las variables resaltadas. Sin plantillas: tarjeta para crear las cuatro estándar o escribir una desde cero. |
 | `/mensajes/nueva` | Nueva plantilla | Nombre, texto con teclas para insertar variables y cuándo toca (al registrar, o día y hora respecto a la llegada o la salida). Al lado, la vista previa como globo de chat con una reserva de ejemplo y los datos de un piso, el momento del aviso y qué datos faltan en el piso. |
 | `/mensajes/[id]` | Editar plantilla | El mismo formulario, avisando de que el horario vale para reservas nuevas y el texto también para las ya programadas; quitar en dos pasos. |
-| `/estado` | Estado del sistema | Acceso, base de datos, correo y recordatorios comprobados en el momento, y el avance por fases. |
+| `/estado` | Estado del sistema | Acceso, base de datos, correo y avisos comprobados en el momento (los avisos, preguntando a QStash si el horario existe y corre); métricas de los últimos 30 días (tiempo de respuesta, mediana y el más lento, y llegadas con el piso sin terminar), y el avance por fases. |
 | cualquier otra | 404 | "Esta llave no abre ninguna puerta", con vuelta al panel. |

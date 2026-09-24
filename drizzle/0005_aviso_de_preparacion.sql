@@ -1,0 +1,1 @@
+ALTER TABLE "reservation" ADD COLUMN "prep_warned_at" timestamp with time zone;

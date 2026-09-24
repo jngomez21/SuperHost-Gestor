@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { sql } from "drizzle-orm";
+import { Client } from "@upstash/qstash";
+import { hostMetrics, METRICS_DAYS } from "@/application/metrics";
 import { requireHost } from "@/app/_lib/host";
+import { formatDuration } from "@/app/_lib/format";
 import { db } from "@/infrastructure/db";
 
 async function checkDatabase() {
@@ -13,17 +16,30 @@ async function checkDatabase() {
   }
 }
 
+// Que haya clave no basta: se pregunta a QStash si el horario del despachador existe y corre.
+async function checkScheduler() {
+  try {
+    const schedule = await new Client({ token: process.env.QSTASH_TOKEN!, retry: false }).schedules.get("dispatch");
+    return schedule.isPaused
+      ? { ok: false, stamp: "En pausa", detail: "El horario de avisos está pausado en QStash." }
+      : { ok: true, stamp: "Activos", detail: "Cada 5 minutos revisan qué mensajes tocan y qué pisos faltan por preparar, y te escriben" };
+  } catch {
+    return { ok: false, stamp: "Sin horario", detail: "No se pudo comprobar el horario en QStash. ¿Falta ejecutar npm run schedule?" };
+  }
+}
+
 const PHASES = [
   { name: "Cimientos", state: "Hecho", status: "done" },
   { name: "Pisos y reservas", state: "Hecho", status: "done" },
   { name: "Checklist de limpieza", state: "Hecho", status: "done" },
   { name: "Mensajes automáticos", state: "Hecho", status: "done" },
-  { name: "Avisos cruzados", state: "Siguiente", status: "next" },
+  { name: "Avisos cruzados", state: "En curso", status: "next" },
 ];
 
 export default async function StatusPage() {
   const host = await requireHost();
-  const database = await checkDatabase();
+  const [database, scheduler, metrics] = await Promise.all([checkDatabase(), checkScheduler(), hostMetrics(host.id)]);
+  const { response, arrivals, unready } = metrics;
   const expires = new Date(host.expires).toLocaleDateString("es-CO", {
     day: "numeric",
     month: "long",
@@ -46,14 +62,9 @@ export default async function StatusPage() {
       name: "Correo",
       ok: Boolean(process.env.RESEND_API_KEY),
       stamp: process.env.RESEND_API_KEY ? "Listo" : "Sin configurar",
-      detail: "Envía tus enlaces de acceso y los avisos de mensajes por enviar",
+      detail: "Envía tus enlaces de acceso y los avisos de mensajes y pisos por preparar",
     },
-    {
-      name: "Recordatorios",
-      ok: Boolean(process.env.QSTASH_CURRENT_SIGNING_KEY),
-      stamp: process.env.QSTASH_CURRENT_SIGNING_KEY ? "Conectados" : "Sin configurar",
-      detail: "Revisa cada 5 minutos qué mensajes tocan y te avisa por correo",
-    },
+    { name: "Avisos", ...scheduler },
   ];
 
   return (
@@ -61,7 +72,8 @@ export default async function StatusPage() {
       <p><Link href="/panel" className="back-link">Panel</Link></p>
       <h1 className="page-title">Estado del <span className="boxed">sistema</span></h1>
       <p className="page-lead">
-        Las piezas de las que depende el gestor, comprobadas ahora mismo, y lo que falta por construir.
+        Las piezas de las que depende el gestor, comprobadas ahora mismo, tus primeras métricas y lo
+        que falta por construir.
       </p>
 
       <section className="section" aria-labelledby="board-title">
@@ -77,6 +89,31 @@ export default async function StatusPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="section" aria-labelledby="metrics-title">
+        <h2 id="metrics-title" className="section-title">Últimos {METRICS_DAYS} días</h2>
+        <p className="section-lead">
+          {response.count} {response.count === 1 ? "mensaje enviado" : "mensajes enviados"} y {arrivals}{" "}
+          {arrivals === 1 ? "llegada" : "llegadas"}. La respuesta se mide desde que toca el mensaje hasta que lo
+          marcas enviado.
+        </p>
+        <dl className="stats">
+          <div className="stat">
+            <dt className="stat-label">Respuesta, mediana</dt>
+            <dd className="stat-number">{response.median === null ? "—" : formatDuration(response.median)}</dd>
+          </div>
+          <div className="stat">
+            <dt className="stat-label">Respuesta más lenta</dt>
+            <dd className="stat-number">{response.slowest === null ? "—" : formatDuration(response.slowest)}</dd>
+          </div>
+          <div className="stat">
+            <dt className="stat-label">Llegadas sin terminar</dt>
+            <dd className={`stat-number${unready ? " stat-alert" : ""}`}>
+              {unready}<span className="stat-of">/{arrivals}</span>
+            </dd>
+          </div>
+        </dl>
       </section>
 
       <section className="section" aria-labelledby="path-title">

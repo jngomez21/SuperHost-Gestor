@@ -1,5 +1,5 @@
 import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
-import { dispatchDue } from "@/application/messaging";
+import { dispatchDue } from "@/application/dispatch";
 
 // Si falla, responde 500 y QStash reintenta; los enlaces del email apuntan al mismo despliegue.
 async function handler(request: Request) {

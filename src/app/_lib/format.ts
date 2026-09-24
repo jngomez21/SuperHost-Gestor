@@ -56,6 +56,15 @@ export function formatDateTime(date: Date): string {
   return dateTimeFormat.format(date);
 }
 
+// "12 min", "3 h 5 min", "2 d 4 h".
+export function formatDuration(ms: number): string {
+  const minutes = Math.round(ms / 60_000);
+  if (minutes < 60) return `${minutes} min`;
+  const [hours, days] = [Math.floor(minutes / 60), Math.floor(minutes / 1440)];
+  if (hours < 24) return minutes % 60 ? `${hours} h ${minutes % 60} min` : `${hours} h`;
+  return hours % 24 ? `${days} d ${hours % 24} h` : `${days} d`;
+}
+
 const clockFormat = new Intl.DateTimeFormat("es-CO", { hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" });
 
 // "Hoy, 9:07 a. m." para un instante, visto desde el día de hoy en Colombia.

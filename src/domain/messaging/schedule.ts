@@ -29,6 +29,18 @@ export function messageStatus(message: Message, now: Date): MessageStatus {
   return message.sendAt <= now ? "due" : "scheduled";
 }
 
+// Tiempo de respuesta: de que un mensaje toca a que el host lo marca enviado. Si lo mandó
+// antes de tiempo, cuenta como 0.
+export function responseTime(sent: { sendAt: Date; sentAt: Date }[]) {
+  const times = sent.map((m) => Math.max(0, m.sentAt.getTime() - m.sendAt.getTime())).sort((a, b) => a - b);
+  const mid = Math.floor(times.length / 2);
+  return {
+    count: times.length,
+    median: times.length === 0 ? null : times.length % 2 ? times[mid] : (times[mid - 1] + times[mid]) / 2,
+    slowest: times.at(-1) ?? null,
+  };
+}
+
 export const REMIND_AFTER_HOURS = 3;
 
 type Pending = Message & { notifiedAt: Date | null; remindedAt: Date | null };

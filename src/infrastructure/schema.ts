@@ -34,6 +34,8 @@ export const reservationTable = pgTable(
     checkIn: date("check_in").notNull(),
     checkOut: date("check_out").notNull(),
     cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
+    // Cuándo se avisó al host de que el piso seguía sin preparar (una sola vez por llegada).
+    prepWarnedAt: timestamp("prep_warned_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [

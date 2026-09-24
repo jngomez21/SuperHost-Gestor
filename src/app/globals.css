@@ -738,6 +738,7 @@ a.keycap { cursor: pointer; }
 .chip-sent { --chip: var(--ok); }
 .chip-arrival { --chip: var(--task-ink); }
 .keycap-busy .chip-in_house { --chip: light-dark(#0f5c32, #3cc07a); }
+.keycap-arrival .chip-cancelled { --chip: #7e1820; }
 
 .chip-large {
   padding: 0.3rem 0.85rem;

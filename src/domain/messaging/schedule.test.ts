@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { dispatchPlan, messageStatus, planMessages, sendAt } from "./schedule.ts";
+import { dispatchPlan, messageStatus, planMessages, responseTime, sendAt } from "./schedule.ts";
 
 const stay = { checkIn: "2026-10-01", checkOut: "2026-10-04" };
 const registeredAt = new Date("2026-09-23T20:00:00Z");
@@ -62,4 +62,12 @@ test("despacho: avisa de lo que acaba de tocar y recuerda una vez a las 3 h", ()
   const plan = dispatchPlan(messages, now);
   assert.deepEqual(plan.notify.map((m) => m.id), ["nuevo"]);
   assert.deepEqual(plan.remind.map((m) => m.id), ["avisado-hace-3h"]);
+});
+
+test("métrica: tiempo de respuesta con mediana y el más lento; mandar antes de tiempo cuenta 0", () => {
+  const sent = (minutes: number) => ({ sendAt: now, sentAt: new Date(now.getTime() + minutes * 60_000) });
+  assert.deepEqual(responseTime([sent(120), sent(10), sent(30)]), { count: 3, median: 30 * 60_000, slowest: 120 * 60_000 });
+  assert.equal(responseTime([sent(10), sent(30)]).median, 20 * 60_000);
+  assert.equal(responseTime([sent(-15)]).slowest, 0);
+  assert.deepEqual(responseTime([]), { count: 0, median: null, slowest: null });
 });
