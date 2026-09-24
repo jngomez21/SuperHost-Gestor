@@ -111,6 +111,8 @@ Historias 1-8 y 19. La pieza que protege directamente las métricas de Superhost
 
 Cada pantalla se revisa en móvil y en modo claro al construirla, sin pasada aparte como la 2.7.
 
+Entre la 3.3 y la 3.4 se rehízo todo el frontend con un sistema de diseño nuevo; las pantallas de esta fase ya se construyen con él (ver [Frontend](#frontend)).
+
 **Hecho cuando:** una reserva nueva programa sola sus mensajes y, cuando toca cada uno, el host recibe el aviso con el texto listo para pegar en Airbnb, sin redactar nada a mano.
 
 ## Fase 4 — Cierre de bucles y validación real
@@ -122,3 +124,49 @@ Historia 13 (aviso si la checklist no está lista antes del check-in) va aquí a
 - Primeras métricas: tiempo de respuesta, incidencias, estado general del sistema en producción.
 
 **Hecho cuando:** un host real usa el sistema en una reserva completa (check-in a check-out) sin intervención manual fuera de lo que el diseño ya prevé.
+
+## Frontend
+
+### Rediseño (entre la 3.3 y la 3.4)
+
+Todo el frontend se rehízo tomando como referencia la estética, las animaciones y la UX de [gitbybit.com](https://gitbybit.com/): se toma su estilo, no su marca, textos ni código. Sustituye al diseño "llavero" de las fases 1 y 2 (etiquetas de llave colgadas y piezas de papel).
+
+- **Base**: fondo con rejilla de puntos, casi negro en oscuro y gris claro en claro. Los dos modos salen de las mismas variables con `light-dark()`.
+- **Tipografía**: Chakra Petch para títulos, botones y navegación; Shantell Sans para las notas escritas a mano; la fuente del sistema para el texto.
+- **Color con significado**: rojo de marca para el logo, la sección activa y lo destructivo; azul para la acción principal; amarillo para las tareas del host; verde para lo hecho o libre.
+- **Componentes**:
+  - Cabecera que cuelga del borde superior, con esquinas en chaflán.
+  - Teclas 3D que se levantan al pasar por encima y se hunden al pulsar: botones, navegación y casillero. La acción principal de cada pantalla va inclinada y con un destello cada pocos segundos.
+  - Títulos con una palabra enmarcada en un paralelogramo ("Libro de *huéspedes*").
+  - Tarjetas amarillas de tarea para lo que el host tiene que hacer.
+  - Recorrido de círculos unidos por una línea para la preparación, la bitácora y las fases.
+  - Celdas por día en la agenda, la ficha de la reserva con marco en degradado y notas a mano con flecha.
+- **Casillero como teclado**: cada piso es una tecla. Arriba significa libre, hundida significa que el huésped tiene la llave y amarilla significa que llega alguien hoy.
+- **Animaciones**:
+  - La cabecera entra desde arriba y las letras del logo saltan al pasar el ratón.
+  - La palabra enmarcada del título cae al cargar.
+  - La casilla marcada salta y suelta un anillo, y el sello "Listo para…" cae con destellos.
+  - Los errores de formulario sacuden el campo.
+- **Preferencias del host**: en la cabecera, la bombilla cambia entre claro y oscuro, y el destello apaga o enciende las animaciones. Se guardan en el navegador y se aplican antes de pintar, sin parpadeo. También se respeta "reducir movimiento" del sistema.
+- **Dónde vive**: todo el estilo en `src/app/globals.css`; las piezas compartidas en `src/app/_components/` (`wordmark`, `preferences`, `hand-note`, `entry`, `icons`, `nav-link`, `field`, `submit-button`).
+- **Comprobado**: todas las pantallas en claro y oscuro, en móvil y escritorio, sin scroll horizontal a 320 y 360 px.
+
+### Vistas
+
+| Ruta | Vista | Qué muestra |
+|---|---|---|
+| `/login` | Acceso | Email del host y botón para recibir el enlace de acceso (sin contraseña). |
+| `/login/revisa` | Enlace enviado | Aviso de que el enlace va en camino y de que solo sirve una vez. |
+| `/login/error` | Error de acceso | Enlace ya usado o caducado, email sin acceso o fallo genérico, con botón para pedir otro. |
+| `/panel` | Llegadas | Fecha de hoy con cifras (llegan, salen, pisos ocupados, por preparar), tarjeta "Por preparar esta semana", casillero de teclas por piso y agenda de los próximos 7 días. |
+| `/reservas` | Libro de huéspedes | Reservas próximas y en curso, e historial de terminadas y canceladas, con su estado. |
+| `/reservas/nueva` | Registrar reserva | Piso y fechas con resumen de la estancia, datos del huésped (email y teléfono opcionales). Acepta `?piso=` para preseleccionar. |
+| `/reservas/[id]` | Ficha de la reserva | Estancia y contacto, tarjeta de preparación del piso, bitácora de notas y cancelación en dos pasos. |
+| `/reservas/[id]/preparar` | Preparar la llegada | Pensada para móvil: progreso fijo arriba y tareas que se guardan al tocarlas; sello "Listo para…" al completarlas. |
+| `/pisos` | Tus pisos | Una tecla por piso con dirección y horarios. |
+| `/pisos/nuevo` | Añadir piso | Formulario con vista previa en vivo de "Así lo verá tu huésped". |
+| `/pisos/[id]` | Editar piso | El mismo formulario y la lista de preparación del piso (añadir, renombrar, quitar tareas). |
+| `/estado` | Estado del sistema | Acceso, base de datos, correo y recordatorios comprobados en el momento, y el avance por fases. |
+| cualquier otra | 404 | "Esta llave no abre ninguna puerta", con vuelta al panel. |
+
+Pendientes de la Fase 3: pantalla de plantillas (3.4), mensajes en la ficha de la reserva (3.5) y sección "Por enviar" en el panel (3.6).
