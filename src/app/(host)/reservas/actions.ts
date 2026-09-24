@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { addNote, cancelReservation, createReservation } from "@/application/reservations";
 import { setTaskDone } from "@/application/housekeeping";
+import { cancelMessage, editMessage, markMessageSent } from "@/application/messaging";
 import { requireHost } from "@/app/_lib/host";
 
 export type FormState = {
@@ -36,6 +37,32 @@ export async function cancelReservationAction(reservationId: string) {
   await cancelReservation(host.id, reservationId);
   revalidatePath(`/reservas/${reservationId}`);
   revalidatePath("/reservas");
+}
+
+export async function editMessageAction(
+  reservationId: string,
+  messageId: string,
+  _previous: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const host = await requireHost();
+  const raw = Object.fromEntries(formData) as Record<string, string>;
+  const result = await editMessage(host.id, messageId, raw);
+  if (!result.ok) return { errors: result.errors, values: raw };
+  revalidatePath(`/reservas/${reservationId}`);
+  return null;
+}
+
+export async function cancelMessageAction(reservationId: string, messageId: string) {
+  const host = await requireHost();
+  await cancelMessage(host.id, messageId);
+  revalidatePath(`/reservas/${reservationId}`);
+}
+
+export async function markMessageSentAction(reservationId: string, messageId: string) {
+  const host = await requireHost();
+  await markMessageSent(host.id, messageId);
+  revalidatePath(`/reservas/${reservationId}`);
 }
 
 export async function toggleTaskAction(reservationId: string, taskId: string, done: boolean) {

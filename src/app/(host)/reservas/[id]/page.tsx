@@ -1,16 +1,18 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPreparation } from "@/application/housekeeping";
+import { listMessages } from "@/application/messaging";
 import { requireHost } from "@/app/_lib/host";
 import { formatDate, formatDateTime, formatTime, STATUS_LABEL } from "@/app/_lib/format";
 import { nights } from "@/domain/reservation/status";
 import { cancelReservationAction } from "../actions";
+import { MessageList } from "./message-list";
 import { NoteForm } from "./note-form";
 
 export default async function ReservationPage({ params }: PageProps<"/reservas/[id]">) {
   const host = await requireHost();
   const { id } = await params;
-  const prep = await getPreparation(host.id, id);
+  const [prep, messages] = await Promise.all([getPreparation(host.id, id), listMessages(host.id, id)]);
   if (!prep) notFound();
 
   const { reservation, progress } = prep;
@@ -97,6 +99,27 @@ export default async function ReservationPage({ params }: PageProps<"/reservas/[
           </div>
         </section>
       )}
+
+      <section className="log" aria-labelledby="messages-title">
+        <h2 id="messages-title" className="section-title">Mensajes</h2>
+        {messages.length === 0 ? (
+          <p className="section-lead">
+            Esta reserva no tiene mensajes. Las reservas nuevas programan los de{" "}
+            <Link href="/mensajes">tus plantillas</Link> al registrarse.
+          </p>
+        ) : (
+          <>
+            <p className="section-lead">Cuando toca uno, cópialo, pégalo en el chat de Airbnb y márcalo como enviado.</p>
+            <MessageList
+              reservationId={reservation.id}
+              propertyId={property.id}
+              messages={messages.map(({ id, name, sendAt, sentAt, status, text, missing, edited }) => ({
+                id, name, sendAt, sentAt, status, text, missing, edited,
+              }))}
+            />
+          </>
+        )}
+      </section>
 
       <section className="log" aria-labelledby="log-title">
         <h2 id="log-title" className="section-title">Bitácora</h2>

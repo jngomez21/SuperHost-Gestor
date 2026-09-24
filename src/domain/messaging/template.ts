@@ -62,9 +62,11 @@ export function messageValues(stay: Stay, place: Place): Values {
 
 export function render(body: string, values: Values): { text: string; missing: Variable[] } {
   const missing = new Set<Variable>();
-  const text = body.replace(PLACEHOLDER, (match, name: string) => {
+  const text = body.replace(PLACEHOLDER, (match, name: string, offset: number) => {
     if (!isVariable(name)) return match;
     const value = values[name]?.trim();
+    // "desde las {hora_llegada}." con "3:00 p. m." no debe quedar en "p. m..".
+    if (value && value.endsWith(".") && body[offset + match.length] === ".") return value.slice(0, -1);
     if (value) return value;
     missing.add(name);
     return `[falta: ${VARIABLES[name]}]`;

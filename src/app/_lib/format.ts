@@ -1,4 +1,5 @@
 import type { ReservationStatus } from "@/domain/reservation/status";
+import type { MessageStatus } from "@/domain/messaging/schedule";
 import { timingLabel, type Trigger } from "@/domain/messaging/template";
 
 const timeFormat = new Intl.DateTimeFormat("es-CO", { hour: "numeric", minute: "2-digit" });
@@ -65,4 +66,11 @@ export const STATUS_LABEL: Record<ReservationStatus, string> = {
   in_house: "Huésped en casa",
   finished: "Terminada",
   cancelled: "Cancelada",
+};
+
+export const MESSAGE_STATUS_LABEL: Record<MessageStatus, string> = {
+  due: "Por enviar",
+  scheduled: "Programado",
+  sent: "Enviado",
+  cancelled: "Cancelado",
 };

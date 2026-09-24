@@ -26,6 +26,11 @@ test("relleno: un dato vacío se marca a la vista y se lista una vez", () => {
   assert.deepEqual(missing, ["clave_wifi", "como_entrar"]);
 });
 
+test("relleno: un dato que acaba en punto no deja dos puntos seguidos", () => {
+  assert.equal(render("Entra desde las {hora_llegada}.", values).text, "Entra desde las 3:00 p. m.");
+  assert.equal(render("Hora: {hora_llegada}, puntual", values).text, "Hora: 3:00 p. m., puntual");
+});
+
 test("relleno: no toca llaves que no son variables", () => {
   assert.equal(render("Precio {especial}", values).text, "Precio {especial}");
 });

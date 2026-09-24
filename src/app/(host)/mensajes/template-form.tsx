@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useRef, useState } from "react";
 import { Field } from "@/app/_components/field";
+import { FilledText } from "@/app/_components/filled-text";
 import { HandNote } from "@/app/_components/hand-note";
 import { SubmitButton } from "@/app/_components/submit-button";
 import { formatDate, formatDateTime } from "@/app/_lib/format";
@@ -174,7 +175,7 @@ function MessagePreview({ values, places }: { values: Values; places: Place[] })
         )}
         <p className="bubble">
           {values.body
-            ? text.split(/(\[falta: [^\]]+\])/).map((part, i) => (i % 2 ? <mark key={i} className="preview-missing">{part}</mark> : part))
+            ? <FilledText text={text} />
             : <span className="preview-kicker">Escribe el texto para ver cómo queda.</span>}
         </p>
         {/* La hora formateada ya acaba en punto ("a. m."). */}
