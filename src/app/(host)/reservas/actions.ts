@@ -57,12 +57,14 @@ export async function cancelMessageAction(reservationId: string, messageId: stri
   const host = await requireHost();
   await cancelMessage(host.id, messageId);
   revalidatePath(`/reservas/${reservationId}`);
+  revalidatePath("/panel");
 }
 
 export async function markMessageSentAction(reservationId: string, messageId: string) {
   const host = await requireHost();
   await markMessageSent(host.id, messageId);
   revalidatePath(`/reservas/${reservationId}`);
+  revalidatePath("/panel");
 }
 
 export async function toggleTaskAction(reservationId: string, taskId: string, done: boolean) {

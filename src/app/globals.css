@@ -1494,6 +1494,9 @@ mark.preview-missing { background: none; }
 
 .msg .bubble { margin: 0.6rem 0 0; }
 
+/* Llegando desde "Por enviar" del panel, el mensaje queda arriba con aire. */
+.msg { scroll-margin-top: 1.5rem; }
+
 /* Por enviar: lo que el host tiene que hacer ahora, en amarillo. */
 .roadmap > .msg-due::before {
   --glow: var(--task);

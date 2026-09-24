@@ -158,7 +158,7 @@ Todo el frontend se rehízo tomando como referencia la estética, las animacione
 | `/login` | Acceso | Email del host y botón para recibir el enlace de acceso (sin contraseña). |
 | `/login/revisa` | Enlace enviado | Aviso de que el enlace va en camino y de que solo sirve una vez. |
 | `/login/error` | Error de acceso | Enlace ya usado o caducado, email sin acceso o fallo genérico, con botón para pedir otro. |
-| `/panel` | Llegadas | Fecha de hoy con cifras (llegan, salen, pisos ocupados, por preparar), tarjeta "Por preparar esta semana", casillero de teclas por piso y agenda de los próximos 7 días. |
+| `/panel` | Llegadas | Fecha de hoy con cifras (llegan, salen, pisos ocupados, por preparar), tarjeta "Por enviar" con los mensajes que ya tocan (cada uno lleva a su texto en la ficha de la reserva), tarjeta "Por preparar esta semana", casillero de teclas por piso y agenda de los próximos 7 días. |
 | `/reservas` | Libro de huéspedes | Reservas próximas y en curso, e historial de terminadas y canceladas, con su estado. |
 | `/reservas/nueva` | Registrar reserva | Piso y fechas con resumen de la estancia, datos del huésped (email y teléfono opcionales). Acepta `?piso=` para preseleccionar. |
 | `/reservas/[id]` | Ficha de la reserva | Estancia y contacto, tarjeta de preparación del piso, mensajes, bitácora de notas y cancelación en dos pasos. Los mensajes van en recorrido por hora de envío: el que está por enviar brilla en amarillo, los enviados llevan su check y el texto exacto que se pegó, y los cancelados quedan tachados. Los pendientes se copian, se marcan enviados, se editan (el texto queda fijo y lleva la marca "Editado") o se dejan sin enviar tras confirmar; si falta un dato del piso, avisa y enlaza al piso. |
@@ -172,4 +172,4 @@ Todo el frontend se rehízo tomando como referencia la estética, las animacione
 | `/estado` | Estado del sistema | Acceso, base de datos, correo y recordatorios comprobados en el momento, y el avance por fases. |
 | cualquier otra | 404 | "Esta llave no abre ninguna puerta", con vuelta al panel. |
 
-Pendiente de la Fase 3: sección "Por enviar" en el panel (3.6).
+Las vistas de la Fase 3 están completas; falta el despachador (3.7), que no tiene pantalla propia.

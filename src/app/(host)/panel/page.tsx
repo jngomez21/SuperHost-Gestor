@@ -2,8 +2,9 @@ import Link from "next/link";
 import { listProperties } from "@/application/properties";
 import { listReservations } from "@/application/reservations";
 import { listPreparations } from "@/application/housekeeping";
+import { listDueMessages } from "@/application/messaging";
 import { requireHost } from "@/app/_lib/host";
-import { dayLabel, formatDate, formatLongDate, formatTime } from "@/app/_lib/format";
+import { dayLabel, dayTimeLabel, formatDate, formatLongDate, formatTime } from "@/app/_lib/format";
 import { HandNote } from "@/app/_components/hand-note";
 import { ArrivalIcon, DepartureIcon } from "@/app/_components/icons";
 import { frontDesk } from "@/domain/reservation/front-desk";
@@ -25,10 +26,11 @@ function KeyPrep({ reservation, prep }: { reservation: { guestName: string } | n
 
 export default async function PanelPage() {
   const host = await requireHost();
-  const [properties, reservations, preps] = await Promise.all([
+  const [properties, reservations, preps, due] = await Promise.all([
     listProperties(host.id),
     listReservations(host.id),
     listPreparations(host.id),
+    listDueMessages(host.id),
   ]);
   const { today, rack, agenda } = frontDesk(properties, reservations, new Date());
   const weekArrivals = agenda.flatMap((day) =>
@@ -72,6 +74,33 @@ export default async function PanelPage() {
         </div>
         {properties.length > 0 && <Link href="/reservas/nueva" className="button button-skew">Registrar reserva</Link>}
       </header>
+
+      {due.length > 0 && (
+        <section className="task" aria-labelledby="send-title">
+          <h2 id="send-title" className="task-head">
+            Por enviar
+            <span>{due.length} {due.length === 1 ? "mensaje" : "mensajes"}</span>
+          </h2>
+          <div className="task-body">
+            <p className="task-text">Cópialos, pégalos en el chat de Airbnb de cada huésped y márcalos como enviados.</p>
+            <ul className="todo-list">
+              {due.map((message) => (
+                <li key={message.id}>
+                  <Link href={`/reservas/${message.reservation.id}#mensaje-${message.id}`} className="todo-row">
+                    <span className="todo-day">{dayTimeLabel(message.sendAt, today)}</span>
+                    <span className="todo-guest">
+                      {message.reservation.guestName}
+                      <span className="todo-property">{message.property.name}</span>
+                    </span>
+                    <span className="todo-progress">{message.name}</span>
+                    <span className="todo-cta">Ver texto</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       {weekArrivals.length > 0 && (
         <section className="task" aria-labelledby="todo-title">

@@ -53,7 +53,7 @@ function MessageStep({ reservationId, propertyId, message }: Props & { message: 
   }
 
   return (
-    <li className={`msg msg-${message.status}`}>
+    <li id={`mensaje-${message.id}`} className={`msg msg-${message.status}`}>
       <p className="msg-head">
         <time className="log-time" dateTime={shown.toISOString()}>{formatDateTime(shown)}</time>
         <span className={`chip chip-${message.status}`}>{MESSAGE_STATUS_LABEL[message.status]}</span>

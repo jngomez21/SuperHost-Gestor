@@ -1,4 +1,4 @@
-import type { ReservationStatus } from "@/domain/reservation/status";
+import { todayInColombia, type ReservationStatus } from "@/domain/reservation/status";
 import type { MessageStatus } from "@/domain/messaging/schedule";
 import { timingLabel, type Trigger } from "@/domain/messaging/template";
 
@@ -54,6 +54,13 @@ export function dayLabel(isoDate: string, today: string): string {
 
 export function formatDateTime(date: Date): string {
   return dateTimeFormat.format(date);
+}
+
+const clockFormat = new Intl.DateTimeFormat("es-CO", { hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" });
+
+// "Hoy, 9:07 a. m." para un instante, visto desde el día de hoy en Colombia.
+export function dayTimeLabel(date: Date, today: string): string {
+  return `${dayLabel(todayInColombia(date), today)}, ${unbreakable(clockFormat.format(date))}`;
 }
 
 export function formatTiming(timing: { trigger: Trigger; dayOffset: number; sendTime: string | null }): string {
