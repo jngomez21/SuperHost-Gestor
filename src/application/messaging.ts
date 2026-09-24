@@ -1,8 +1,11 @@
-import { and, asc, eq, inArray, isNull, type SQL } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, lte, type SQL } from "drizzle-orm";
 import { db } from "@/infrastructure/db";
+import { sendEmail } from "@/infrastructure/email";
+import { usersTable } from "@/infrastructure/auth-schema";
 import { messageTemplateTable, propertyTable, reservationMessageTable, reservationTable } from "@/infrastructure/schema";
 import { isUuid, type Raw } from "@/domain/fields";
-import { messageStatus, planMessages } from "@/domain/messaging/schedule";
+import { digestEmail } from "@/domain/messaging/digest";
+import { dispatchPlan, messageStatus, planMessages } from "@/domain/messaging/schedule";
 import { messageValues, render, STANDARD_TEMPLATES, validateMessage, validateTemplate } from "@/domain/messaging/template";
 import { ownedPropertyIds } from "./properties";
 
@@ -135,11 +138,14 @@ async function readMessages(where: SQL | undefined, now: Date) {
   return rows.map(({ message, template, reservation, property }) => {
     // La BD garantiza que hay texto guardado o plantilla de la que rellenarlo.
     const filled = message.body === null && template ? render(template.body, messageValues(reservation, property)) : null;
+    const reservationCancelled = reservation.cancelledAt !== null;
     return {
       ...message,
+      hostId: property.hostId,
+      reservationCancelled,
       reservation: { id: reservation.id, guestName: reservation.guestName },
       property: { id: property.id, name: property.name },
-      status: messageStatus({ ...message, reservationCancelled: reservation.cancelledAt !== null }, now),
+      status: messageStatus({ ...message, reservationCancelled }, now),
       text: message.body ?? filled?.text ?? "",
       missing: filled?.missing ?? [],
       edited: message.body !== null && message.sentAt === null,
@@ -161,6 +167,60 @@ export async function listDueMessages(hostId: string, now = new Date()) {
     now
   );
   return pending.filter((message) => message.status === "due");
+}
+
+// La llama QStash cada 5 min. Un email por host solo si hay algo: lo que acaba de tocar
+// y, una vez, lo que sigue sin enviar horas después del primer aviso.
+export async function dispatchDue(origin: string, now = new Date()) {
+  const t = reservationMessageTable;
+  const pending = await readMessages(
+    and(isNull(t.sentAt), isNull(t.cancelledAt), isNull(t.remindedAt), lte(t.sendAt, now)),
+    now
+  );
+  const plan = dispatchPlan(pending, now);
+  const hostIds = [...new Set([...plan.notify, ...plan.remind].map((m) => m.hostId))];
+  if (hostIds.length === 0) return { notified: 0, reminded: 0 };
+
+  const hosts = await db.select().from(usersTable).where(inArray(usersTable.id, hostIds));
+  let notified = 0;
+  let reminded = 0;
+  for (const host of hosts) {
+    if (!host.email) continue;
+    const mine = <M extends { hostId: string }>(list: M[]) => list.filter((m) => m.hostId === host.id);
+
+    // Se marcan antes de enviar: si QStash repite la llamada, nada se avisa dos veces.
+    const [claimedNotify, claimedRemind] = await db.batch([
+      db
+        .update(t)
+        .set({ notifiedAt: now })
+        .where(and(inArray(t.id, mine(plan.notify).map((m) => m.id)), isNull(t.notifiedAt)))
+        .returning({ id: t.id }),
+      db
+        .update(t)
+        .set({ remindedAt: now })
+        .where(and(inArray(t.id, mine(plan.remind).map((m) => m.id)), isNull(t.remindedAt)))
+        .returning({ id: t.id }),
+    ]);
+    const claimed = (list: { id: string }[]) => new Set(list.map((row) => row.id));
+    const notify = mine(plan.notify).filter((m) => claimed(claimedNotify).has(m.id));
+    const remind = mine(plan.remind).filter((m) => claimed(claimedRemind).has(m.id));
+    if (notify.length + remind.length === 0) continue;
+
+    const { subject, text } = digestEmail(notify, remind, origin);
+    try {
+      await sendEmail(host.email, subject, text);
+    } catch (error) {
+      // Se desmarcan para que el reintento de QStash vuelva a avisar.
+      await db.batch([
+        db.update(t).set({ notifiedAt: null }).where(inArray(t.id, notify.map((m) => m.id))),
+        db.update(t).set({ remindedAt: null }).where(inArray(t.id, remind.map((m) => m.id))),
+      ]);
+      throw error;
+    }
+    notified += notify.length;
+    reminded += remind.length;
+  }
+  return { notified, reminded };
 }
 
 export async function editMessage(hostId: string, messageId: string, raw: Raw) {

@@ -81,7 +81,9 @@ Historias 9, 10, 11, 12. Depende solo de la Fase 1. Va antes que mensajería por
 
 **Hecho cuando:** el host tiene una checklist reutilizable y ve de un vistazo qué pisos están listos para la próxima llegada.
 
-## Fase 3 — Mensajería automática
+## Fase 3 — Mensajería automática ✅ Hecha
+
+Cambios respecto al plan: las plantillas tienen sección propia (`/mensajes`) en la navegación. El email-resumen va en texto plano, para copiar cada mensaje tal cual, y enlaza a cada uno en la ficha de la reserva. El horario de QStash se crea con `npm run schedule` (id fijo `dispatch`: volver a ejecutarlo lo actualiza), y `npm run check` comprueba que el despachador exige firma. Al rellenar, un dato que acaba en punto ya no deja dos seguidos ("p. m.."). **Para activarla en producción**: desplegar y ejecutar `npm run schedule` una vez.
 
 Historias 1-8 y 19. La pieza que protege directamente las métricas de Superhost (tasa de respuesta). Es la más compleja: plantillas + variables + integración con QStash y Resend — se deja para después de validar Fases 1-2 con el modelo de reserva ya probado.
 
@@ -171,5 +173,3 @@ Todo el frontend se rehízo tomando como referencia la estética, las animacione
 | `/mensajes/[id]` | Editar plantilla | El mismo formulario, avisando de que el horario vale para reservas nuevas y el texto también para las ya programadas; quitar en dos pasos. |
 | `/estado` | Estado del sistema | Acceso, base de datos, correo y recordatorios comprobados en el momento, y el avance por fases. |
 | cualquier otra | 404 | "Esta llave no abre ninguna puerta", con vuelta al panel. |
-
-Las vistas de la Fase 3 están completas; falta el despachador (3.7), que no tiene pantalla propia.

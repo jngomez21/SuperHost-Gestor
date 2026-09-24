@@ -10,6 +10,7 @@
     "lint": "eslint",
     "test": "node --test \"src/**/*.test.ts\"",
     "check": "cross-env NODE_OPTIONS=--use-env-proxy node --env-file=.env.local scripts/check.mjs",
+    "schedule": "cross-env NODE_OPTIONS=--use-env-proxy node --env-file=.env.local scripts/schedule.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "cross-env NODE_OPTIONS=--use-env-proxy node --env-file=.env.local scripts/migrate.mjs"
   },

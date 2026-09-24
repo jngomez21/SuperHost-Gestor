@@ -17,8 +17,8 @@ const PHASES = [
   { name: "Cimientos", state: "Hecho", status: "done" },
   { name: "Pisos y reservas", state: "Hecho", status: "done" },
   { name: "Checklist de limpieza", state: "Hecho", status: "done" },
-  { name: "Mensajes automáticos", state: "En curso", status: "next" },
-  { name: "Avisos cruzados", state: "Pendiente", status: "" },
+  { name: "Mensajes automáticos", state: "Hecho", status: "done" },
+  { name: "Avisos cruzados", state: "Siguiente", status: "next" },
 ];
 
 export default async function StatusPage() {
@@ -46,13 +46,13 @@ export default async function StatusPage() {
       name: "Correo",
       ok: Boolean(process.env.RESEND_API_KEY),
       stamp: process.env.RESEND_API_KEY ? "Listo" : "Sin configurar",
-      detail: "Envía tus enlaces de acceso y, pronto, los avisos de mensajes por enviar",
+      detail: "Envía tus enlaces de acceso y los avisos de mensajes por enviar",
     },
     {
       name: "Recordatorios",
       ok: Boolean(process.env.QSTASH_CURRENT_SIGNING_KEY),
       stamp: process.env.QSTASH_CURRENT_SIGNING_KEY ? "Conectados" : "Sin configurar",
-      detail: "Recibe avisos programados para disparar mensajes a tiempo",
+      detail: "Revisa cada 5 minutos qué mensajes tocan y te avisa por correo",
     },
   ];
 

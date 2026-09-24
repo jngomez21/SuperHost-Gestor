@@ -15,6 +15,10 @@ const checks = {
     const res = await fetch(`${APP_URL}/api/cron/ping`, { method: "POST" });
     return res.status >= 400 && res.status < 500 && res.status !== 404;
   },
+  "Despachador exige firma (/api/cron/dispatch sin firma → 4xx)": async () => {
+    const res = await fetch(`${APP_URL}/api/cron/dispatch`, { method: "POST" });
+    return res.status >= 400 && res.status < 500 && res.status !== 404;
+  },
 };
 
 let failed = 0;
