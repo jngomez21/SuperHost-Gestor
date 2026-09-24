@@ -36,6 +36,8 @@ export const reservationTable = pgTable(
     cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
     // Cuándo se avisó al host de que el piso seguía sin preparar (una sola vez por llegada).
     prepWarnedAt: timestamp("prep_warned_at", { withTimezone: true }),
+    // Llave del enlace del huésped (ADR-007). Regenerarlo invalida el anterior al instante.
+    guestToken: uuid("guest_token").notNull().unique().defaultRandom(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [

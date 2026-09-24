@@ -4,6 +4,7 @@ import { getTemplate } from "@/application/messaging";
 import { listProperties } from "@/application/properties";
 import { requireHost } from "@/app/_lib/host";
 import { formatTiming } from "@/app/_lib/format";
+import { EXAMPLE_TOKEN, guestLink } from "@/infrastructure/site";
 import { removeTemplateAction } from "../actions";
 import { TemplateForm } from "../template-form";
 
@@ -18,7 +19,7 @@ export default async function EditTemplatePage({ params }: PageProps<"/mensajes/
       <p><Link href="/mensajes" className="back-link">Tus plantillas</Link></p>
       <h1 className="page-title">{template.name}</h1>
       <p className="page-lead">{formatTiming(template)}</p>
-      <TemplateForm id={template.id} initial={template} places={properties} />
+      <TemplateForm id={template.id} initial={template} places={properties} exampleLink={guestLink(EXAMPLE_TOKEN)} />
 
       <details className="danger">
         <summary className="danger-summary">Quitar plantilla</summary>

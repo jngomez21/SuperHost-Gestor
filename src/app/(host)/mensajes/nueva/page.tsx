@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listProperties } from "@/application/properties";
 import { requireHost } from "@/app/_lib/host";
+import { EXAMPLE_TOKEN, guestLink } from "@/infrastructure/site";
 import { TemplateForm } from "../template-form";
 
 export default async function NewTemplatePage() {
@@ -14,7 +15,7 @@ export default async function NewTemplatePage() {
       <p className="page-lead">
         Elige cuándo toca y escribe el mensaje una vez: cada reserva nueva lo programa con sus propios datos.
       </p>
-      <TemplateForm id={null} places={properties} />
+      <TemplateForm id={null} places={properties} exampleLink={guestLink(EXAMPLE_TOKEN)} />
     </main>
   );
 }

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { addNote, cancelReservation, createReservation } from "@/application/reservations";
+import { addNote, cancelReservation, createReservation, regenerateGuestToken } from "@/application/reservations";
 import { setTaskDone } from "@/application/housekeeping";
 import { cancelMessage, editMessage, markMessageSent } from "@/application/messaging";
 import { requireHost } from "@/app/_lib/host";
@@ -37,6 +37,12 @@ export async function cancelReservationAction(reservationId: string) {
   await cancelReservation(host.id, reservationId);
   revalidatePath(`/reservas/${reservationId}`);
   revalidatePath("/reservas");
+}
+
+export async function regenerateGuestTokenAction(reservationId: string) {
+  const host = await requireHost();
+  await regenerateGuestToken(host.id, reservationId);
+  revalidatePath(`/reservas/${reservationId}`);
 }
 
 export async function editMessageAction(

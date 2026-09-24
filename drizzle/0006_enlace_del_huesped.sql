@@ -1,0 +1,2 @@
+ALTER TABLE "reservation" ADD COLUMN "guest_token" uuid DEFAULT gen_random_uuid() NOT NULL;--> statement-breakpoint
+ALTER TABLE "reservation" ADD CONSTRAINT "reservation_guest_token_unique" UNIQUE("guest_token");

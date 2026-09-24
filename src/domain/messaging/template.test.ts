@@ -12,7 +12,18 @@ const place = {
   checkInTime: "15:00:00",
   checkOutTime: "11:00:00",
 };
-const values = messageValues(stay, place);
+const link = "https://super-host-gestor.vercel.app/estancia/3b1f0c2e-8a4d-4e6b-9c5a-1d2e3f4a5b6c";
+const values = messageValues(stay, place, link);
+
+test("relleno: {enlace} pone la página del huésped tal cual", () => {
+  assert.equal(render("Todo aquí: {enlace}", values).text, `Todo aquí: ${link}`);
+  assert.deepEqual(render("{enlace}", messageValues(stay, place, null)).missing, ["enlace"]);
+});
+
+test("la bienvenida estándar lleva el enlace del huésped", () => {
+  const welcome = STANDARD_TEMPLATES.find((t) => t.trigger === "booked")!;
+  assert.ok(render(welcome.body, values).text.includes(link));
+});
 
 test("relleno: nombre de pila, fecha larga y hora legible", () => {
   const { text, missing } = render("Hola {nombre}, te espero el {llegada} desde las {hora_llegada} en {direccion}.", values);

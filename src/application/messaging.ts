@@ -1,5 +1,6 @@
 import { and, asc, eq, inArray, isNull, lte, type SQL } from "drizzle-orm";
 import { db } from "@/infrastructure/db";
+import { guestLink } from "@/infrastructure/site";
 import { messageTemplateTable, propertyTable, reservationMessageTable, reservationTable } from "@/infrastructure/schema";
 import { isUuid, type Raw } from "@/domain/fields";
 import { messageStatus, planMessages } from "@/domain/messaging/schedule";
@@ -134,7 +135,10 @@ async function readMessages(where: SQL | undefined, now: Date) {
 
   return rows.map(({ message, template, reservation, property }) => {
     // La BD garantiza que hay texto guardado o plantilla de la que rellenarlo.
-    const filled = message.body === null && template ? render(template.body, messageValues(reservation, property)) : null;
+    const filled =
+      message.body === null && template
+        ? render(template.body, messageValues(reservation, property, guestLink(reservation.guestToken)))
+        : null;
     const reservationCancelled = reservation.cancelledAt !== null;
     return {
       ...message,

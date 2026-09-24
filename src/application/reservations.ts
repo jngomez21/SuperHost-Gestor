@@ -1,7 +1,8 @@
-import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "@/infrastructure/db";
 import { propertyTable, reservationMessageTable, reservationNoteTable, reservationTable } from "@/infrastructure/schema";
 import { isUuid, type Raw } from "@/domain/fields";
+import { firstName, guestView } from "@/domain/reservation/guest";
 import { reservationStatus } from "@/domain/reservation/status";
 import { validateNote, validateReservation } from "@/domain/reservation/validate";
 import { messagesToSchedule } from "./messaging";
@@ -88,6 +89,68 @@ export async function cancelReservation(hostId: string, id: string) {
   const rows = await db
     .update(reservationTable)
     .set({ cancelledAt: new Date() })
+    .where(
+      and(
+        eq(reservationTable.id, id),
+        isNull(reservationTable.cancelledAt),
+        inArray(reservationTable.propertyId, ownedPropertyIds(hostId))
+      )
+    )
+    .returning({ id: reservationTable.id });
+  return rows.length > 0;
+}
+
+// Lo que ve el huésped con su enlace. Solo se leen los datos de su estancia y los del piso
+// para llegar: nunca notas, contacto ni otras reservas. Tras la salida, ni siquiera el acceso.
+export async function getGuestStay(token: string, now = new Date()) {
+  if (!isUuid(token)) return null;
+  const r = reservationTable;
+  const p = propertyTable;
+  const [row] = await db
+    .select({
+      guestName: r.guestName,
+      guestCount: r.guestCount,
+      checkIn: r.checkIn,
+      checkOut: r.checkOut,
+      cancelledAt: r.cancelledAt,
+      propertyName: p.name,
+      address: p.address,
+      accessInstructions: p.accessInstructions,
+      wifiName: p.wifiName,
+      wifiPassword: p.wifiPassword,
+      checkInTime: p.checkInTime,
+      checkOutTime: p.checkOutTime,
+    })
+    .from(r)
+    .innerJoin(p, eq(r.propertyId, p.id))
+    .where(eq(r.guestToken, token));
+  if (!row) return null;
+
+  const view = guestView(row, row, now);
+  if (!view) return null;
+  const guest = { firstName: firstName(row.guestName), propertyName: row.propertyName };
+  if (view === "thanks") return { view, ...guest };
+  return {
+    view,
+    ...guest,
+    guestCount: row.guestCount,
+    checkIn: row.checkIn,
+    checkOut: row.checkOut,
+    address: row.address,
+    accessInstructions: row.accessInstructions,
+    wifiName: row.wifiName,
+    wifiPassword: row.wifiPassword,
+    checkInTime: row.checkInTime,
+    checkOutTime: row.checkOutTime,
+  };
+}
+
+// Un token nuevo para la reserva: el enlace anterior deja de funcionar al instante (ADR-007).
+export async function regenerateGuestToken(hostId: string, id: string) {
+  if (!isUuid(id)) return false;
+  const rows = await db
+    .update(reservationTable)
+    .set({ guestToken: sql`default` })
     .where(
       and(
         eq(reservationTable.id, id),

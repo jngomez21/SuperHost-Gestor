@@ -43,6 +43,13 @@
       "when": 1790260538852,
       "tag": "0005_aviso_de_preparacion",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790285826701,
+      "tag": "0006_enlace_del_huesped",
+      "breakpoints": true
     }
   ]
 }

@@ -114,6 +114,7 @@ Ver `docs/adr/`:
 - [ADR-004](docs/adr/0004-disparo-mensajes-cron.md) — Upstash QStash vs. alternativas de cron para disparos programados
 - [ADR-005](docs/adr/0005-proveedor-hosting-datos.md) — Neon+Auth.js vs. Supabase vs. PocketBase autoalojado
 - [ADR-006](docs/adr/0006-canal-de-mensajes.md) — Copiar y pegar en Airbnb vs. email directo al huésped
+- [ADR-007](docs/adr/0007-enlace-del-huesped.md) — Enlace por reserva con token vs. cuenta del huésped o enlace por piso
 
 ## Riesgos y límites conocidos
 

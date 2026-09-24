@@ -1,4 +1,5 @@
 import { isTime, text, type Raw, type Result } from "../fields.ts";
+import { firstName } from "../reservation/guest.ts";
 
 export type Trigger = "booked" | "check_in" | "check_out";
 
@@ -16,6 +17,7 @@ export const VARIABLES = {
   wifi: "nombre del wifi",
   clave_wifi: "clave del wifi",
   como_entrar: "cómo entrar",
+  enlace: "enlace del huésped",
 } as const;
 
 export type Variable = keyof typeof VARIABLES;
@@ -45,9 +47,10 @@ type Place = {
   checkOutTime: string;
 };
 
-export function messageValues(stay: Stay, place: Place): Values {
+// `link`: la página del huésped con toda su estancia (ADR-007).
+export function messageValues(stay: Stay, place: Place, link: string | null): Values {
   return {
-    nombre: stay.guestName.trim().split(/\s+/)[0],
+    nombre: firstName(stay.guestName),
     piso: place.name,
     direccion: place.address,
     llegada: day(stay.checkIn),
@@ -57,6 +60,7 @@ export function messageValues(stay: Stay, place: Place): Values {
     wifi: place.wifiName,
     clave_wifi: place.wifiPassword,
     como_entrar: place.accessInstructions,
+    enlace: link,
   };
 }
 
@@ -145,7 +149,10 @@ export const STANDARD_TEMPLATES: TemplateInput[] = [
     sendTime: null,
     body: `¡Hola {nombre}! Gracias por reservar {piso}. Te espero el {llegada}; puedes entrar desde las {hora_llegada}.
 
-El día antes te mandaré por aquí la dirección y cómo entrar. Si mientras tanto necesitas algo, escríbeme.`,
+Aquí tienes todo lo de tu estancia (dirección, cómo entrar y wifi), para tenerlo a mano hasta que te vayas:
+{enlace}
+
+Si mientras tanto necesitas algo, escríbeme por aquí.`,
   },
   {
     name: "Instrucciones de llegada",

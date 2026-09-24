@@ -147,6 +147,46 @@ Historia 13 (aviso si la checklist no está lista antes del check-in) va aquí a
 
 **Hecho cuando:** un host real usa el sistema en una reserva completa (check-in a check-out) sin intervención manual fuera de lo que el diseño ya prevé.
 
+## Fase 5 — Enlace del huésped
+
+**Avance:** hechas la 5.1 a la 5.5 y la 5.8. La 5.6 y la 5.7 tienen una versión provisional mínima (datos de la estancia; agradecimiento con la reseña) a la espera del contenido y el diseño que defina el host. **Para activarla en producción**: `npm run db:migrate` (migración `0006`) antes de desplegar, y añadir `{enlace}` a la Bienvenida ya guardada en `/mensajes`. El enlace usa `APP_URL` si está definida y, si no, el dominio de producción que da Vercel.
+
+Sin historias en `SPEC.md`: nace después del plan original. En vez de repartir la información de la estancia entre varios mensajes, la bienvenida lleva un enlace a una página personal del huésped con todo lo que necesita. Depende de la Fase 1 (reserva y piso) y de la Fase 3 (la bienvenida que lleva el enlace). El token pertenece a la reserva, así que vive en el módulo `reservation`; la página queda fuera del área del host y no pide login.
+
+### Decisiones
+
+- **Un enlace por reserva**: `/estancia/<token>`. El token es de la reserva, no del piso: el enlace de Pepito siempre lleva a la estancia de Pepito, aunque mañana llegue Carlos al mismo piso. Cada reserva nace con uno distinto, que genera la BD como valor por defecto aleatorio de la columna; la migración da uno a las reservas que ya existen.
+- **El enlace es la llave.** El huésped no inicia sesión y no se guarda nada en su navegador: quien tiene el enlace ve la estancia. Que lo reenvíe a sus acompañantes se acepta. El token se guarda tal cual, sin hash: la BD ya guarda en claro los datos que protege (código de acceso, wifi).
+- **Todo visible desde que recibe el enlace**: dirección, horarios, cómo entrar, wifi y clave, desde que se registra la reserva hasta la hora de salida.
+- **Caducidad derivada, no guardada**, como el estado de la reserva. Hasta la hora de salida (fecha de salida más hora de salida del piso, en hora de Colombia) el enlace muestra la estancia; desde ese momento, el mismo enlace solo muestra el agradecimiento. No hay cron que borre tokens.
+- **Tras el check-out, agradecimiento e invitación a la reseña**: personalizada con su nombre, llamativa y pensada para que deje la reseña desde la app de Airbnb. No muestra nada que dé acceso al piso (dirección, código, wifi).
+- **Nunca se muestran** la bitácora, el email ni el teléfono del huésped, ni datos de otras reservas.
+- **Enlace inválido = 404**, sin distinguir el motivo: token inventado, reserva cancelada o token regenerado. Así no se puede averiguar si un token existió.
+- **Regenerar desde la ficha de la reserva**, en dos pasos: la reserva recibe un token nuevo y el anterior deja de funcionar al instante, porque solo existe el token actual. El enlace nuevo hay que mandarlo otra vez por Airbnb: la bienvenida ya enviada lleva el viejo.
+- **El enlace viaja en la bienvenida**, por el chat de Airbnb (ADR-006 no cambia). Nueva variable `{enlace}` en las plantillas, y la Bienvenida estándar la incluye. La plantilla que el host ya tiene guardada no cambia sola: se añade `{enlace}` desde `/mensajes`, y como los mensajes pendientes se rellenan con la plantilla actual, también lo llevarán las bienvenidas aún sin enviar. Los otros tres mensajes siguen igual.
+- **La ficha de la reserva siempre muestra el enlace** para copiarlo: una reserva registrada con la estancia ya empezada no programa bienvenida.
+- **Fuera de los buscadores y sin filtrar el token**: la página no se indexa y no manda el token en el `Referer` al pulsar un enlace externo (mapa, Airbnb).
+- **El contenido y el diseño de las vistas del huésped los define el host a medida que avance la fase**; esta fase fija el comportamiento, no la maquetación.
+
+### Tareas
+
+| # | Tarea | Historias |
+|---|---|---|
+| 5.1 | ADR-007: enlace del huésped con token, frente a una cuenta para el huésped o datos sueltos en el mensaje | — |
+| 5.2 | Esquema: token único y aleatorio en la reserva, con migración que rellena las existentes | — |
+| 5.3 | Casos de uso: buscar la estancia por token (solo los datos permitidos) y regenerar el token; qué vista toca según la hora, con tests | — |
+| 5.4 | Plantillas: variable `{enlace}` con la URL completa, y Bienvenida estándar que la incluye | — |
+| 5.5 | Ficha de reserva: enlace del huésped con copiar y regenerar en dos pasos | — |
+| 5.6 | Vista de la estancia (`/estancia/<token>`), con el contenido que defina el host | — |
+| 5.7 | Vista de agradecimiento tras el check-out, con la invitación a dejar la reseña desde la app de Airbnb | — |
+| 5.8 | `npm run check`: un token inventado da 404 en producción | — |
+
+Cada pantalla se revisa en móvil y en modo claro al construirla.
+
+**Antes de empezar:** mandar un enlace de prueba en una conversación real de Airbnb para confirmar que el chat no lo oculta ni lo marca.
+
+**Hecho cuando:** el huésped abre el enlace de su bienvenida y ve su estancia sin iniciar sesión; desde su hora de salida, el mismo enlace solo le agradece e invita a la reseña; el siguiente huésped del mismo piso recibe otro enlace; y al regenerar, el enlace anterior deja de funcionar al instante.
+
 ## Frontend
 
 ### Rediseño (entre la 3.3 y la 3.4)

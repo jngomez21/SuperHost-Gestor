@@ -4,8 +4,11 @@ import { getPreparation } from "@/application/housekeeping";
 import { listMessages } from "@/application/messaging";
 import { requireHost } from "@/app/_lib/host";
 import { formatDate, formatDateTime, formatTime, STATUS_LABEL } from "@/app/_lib/format";
+import { firstName } from "@/domain/reservation/guest";
 import { nights } from "@/domain/reservation/status";
+import { guestLink } from "@/infrastructure/site";
 import { cancelReservationAction } from "../actions";
+import { GuestLink } from "./guest-link";
 import { MessageList } from "./message-list";
 import { NoteForm } from "./note-form";
 
@@ -98,6 +101,17 @@ export default async function ReservationPage({ params }: PageProps<"/reservas/[
             </div>
           </div>
         </section>
+      )}
+
+      {status !== "cancelled" && (
+        // Con el enlace como key, al regenerarlo la tarjeta vuelve a su estado inicial.
+        <GuestLink
+          key={reservation.guestToken}
+          reservationId={reservation.id}
+          link={guestLink(reservation.guestToken)}
+          guestFirstName={firstName(reservation.guestName)}
+          finished={status === "finished"}
+        />
       )}
 
       <section className="log" aria-labelledby="messages-title">

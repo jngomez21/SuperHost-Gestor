@@ -19,6 +19,10 @@ const checks = {
     const res = await fetch(`${APP_URL}/api/cron/dispatch`, { method: "POST" });
     return res.status >= 400 && res.status < 500 && res.status !== 404;
   },
+  "Enlace de huésped inventado → 404": async () => {
+    const res = await fetch(`${APP_URL}/estancia/00000000-0000-4000-8000-000000000000`, { redirect: "manual" });
+    return res.status === 404;
+  },
 };
 
 let failed = 0;

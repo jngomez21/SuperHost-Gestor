@@ -31,10 +31,11 @@ const EXAMPLE_PLACE: Place = {
   checkOutTime: "11:00",
 };
 
-export function TemplateForm({ id, initial, places }: {
+export function TemplateForm({ id, initial, places, exampleLink }: {
   id: string | null;
   initial?: { name: string; body: string; trigger: Trigger; dayOffset: number; sendTime: string | null };
   places: Place[];
+  exampleLink: string;
 }) {
   const [state, action] = useActionState<TemplateFormState, FormData>(saveTemplate.bind(null, id), null);
   const defaults: Values = {
@@ -139,17 +140,17 @@ export function TemplateForm({ id, initial, places }: {
         </div>
       </form>
 
-      <MessagePreview values={live} places={places.length ? places : [EXAMPLE_PLACE]} />
+      <MessagePreview values={live} places={places.length ? places : [EXAMPLE_PLACE]} exampleLink={exampleLink} />
     </div>
   );
 }
 
-function MessagePreview({ values, places }: { values: Values; places: Place[] }) {
+function MessagePreview({ values, places, exampleLink }: { values: Values; places: Place[]; exampleLink: string }) {
   const [placeId, setPlaceId] = useState(places[0].id);
   const place = places.find((p) => p.id === placeId) ?? places[0];
   const today = todayInColombia(new Date());
   const stay = { guestName: "Laura Restrepo", checkIn: addDays(today, 10), checkOut: addDays(today, 13) };
-  const { text, missing } = render(values.body, messageValues(stay, place));
+  const { text, missing } = render(values.body, messageValues(stay, place, exampleLink));
   const trigger = values.trigger as Trigger;
   const timing = { trigger, dayOffset: Number(values.dayOffset), sendTime: values.sendTime };
   const when = trigger === "booked"
