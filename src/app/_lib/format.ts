@@ -1,4 +1,5 @@
 import type { ReservationStatus } from "@/domain/reservation/status";
+import { timingLabel, type Trigger } from "@/domain/messaging/template";
 
 const timeFormat = new Intl.DateTimeFormat("es-CO", { hour: "numeric", minute: "2-digit" });
 const dateFormat = new Intl.DateTimeFormat("es-CO", {
@@ -52,6 +53,11 @@ export function dayLabel(isoDate: string, today: string): string {
 
 export function formatDateTime(date: Date): string {
   return dateTimeFormat.format(date);
+}
+
+export function formatTiming(timing: { trigger: Trigger; dayOffset: number; sendTime: string | null }): string {
+  const label = timingLabel(timing.trigger, timing.dayOffset);
+  return timing.sendTime ? `${label}, a las ${formatTime(timing.sendTime)}` : label;
 }
 
 export const STATUS_LABEL: Record<ReservationStatus, string> = {

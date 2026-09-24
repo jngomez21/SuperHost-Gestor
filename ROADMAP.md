@@ -166,7 +166,10 @@ Todo el frontend se rehízo tomando como referencia la estética, las animacione
 | `/pisos` | Tus pisos | Una tecla por piso con dirección y horarios. |
 | `/pisos/nuevo` | Añadir piso | Formulario con vista previa en vivo de "Así lo verá tu huésped". |
 | `/pisos/[id]` | Editar piso | El mismo formulario y la lista de preparación del piso (añadir, renombrar, quitar tareas). |
+| `/mensajes` | Tus plantillas | Recorrido de las plantillas en el orden en que se envían, con su momento y el texto con las variables resaltadas. Sin plantillas: tarjeta para crear las cuatro estándar o escribir una desde cero. |
+| `/mensajes/nueva` | Nueva plantilla | Nombre, texto con teclas para insertar variables y cuándo toca (al registrar, o día y hora respecto a la llegada o la salida). Al lado, la vista previa como globo de chat con una reserva de ejemplo y los datos de un piso, el momento del aviso y qué datos faltan en el piso. |
+| `/mensajes/[id]` | Editar plantilla | El mismo formulario, avisando de que el horario vale para reservas nuevas y el texto también para las ya programadas; quitar en dos pasos. |
 | `/estado` | Estado del sistema | Acceso, base de datos, correo y recordatorios comprobados en el momento, y el avance por fases. |
 | cualquier otra | 404 | "Esta llave no abre ninguna puerta", con vuelta al panel. |
 
-Pendientes de la Fase 3: pantalla de plantillas (3.4), mensajes en la ficha de la reserva (3.5) y sección "Por enviar" en el panel (3.6).
+Pendientes de la Fase 3: mensajes en la ficha de la reserva (3.5) y sección "Por enviar" en el panel (3.6).

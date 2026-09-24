@@ -22,7 +22,9 @@ export function ReservationForm({ properties, preselected }: { properties: Prope
   const value = (name: string) => defaults[name] ?? "";
 
   return (
+    // Un <select> solo toma su valor inicial al montarse: tras un error se remonta con lo enviado.
     <form
+      key={JSON.stringify(state?.values)}
       action={action}
       className="form form-single"
       noValidate
