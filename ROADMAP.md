@@ -117,7 +117,9 @@ Entre la 3.3 y la 3.4 se rehízo todo el frontend con un sistema de diseño nuev
 
 **Hecho cuando:** una reserva nueva programa sola sus mensajes y, cuando toca cada uno, el host recibe el aviso con el texto listo para pegar en Airbnb, sin redactar nada a mano.
 
-## Fase 4 — Cierre de bucles y validación real
+## Fase 4 — Cierre de bucles y validación real ✅ Hecha
+
+Cambios respecto al plan: la 4.5 (una reserva completa con un host real) se sustituyó, por decisión del host, por una prueba end-to-end del sistema completo el 24 de septiembre de 2026: una réplica aislada con el mismo código y las migraciones reales sobre Postgres, manejada con un navegador real en móvil y escritorio, y el despachador probado con una línea temporal simulada (avisos, recordatorio a las 3 h, aviso de preparación con las reglas de 24 h y cambio de huésped, fallo y reintento de Resend, métricas). Resultado: 90 de 91 comprobaciones; los hallazgos que quedan abiertos están en [Pendientes](#pendientes).
 
 Historia 13 (aviso si la checklist no está lista antes del check-in) va aquí a propósito: es la única historia que depende de que **ambos** módulos (housekeeping y messaging) ya existan — implementarla antes obligaría a un atajo temporal que luego se tira. Esta fase también es la de pulido y la primera validación con un host real operando el sistema.
 
@@ -147,15 +149,15 @@ Historia 13 (aviso si la checklist no está lista antes del check-in) va aquí a
 
 **Hecho cuando:** un host real usa el sistema en una reserva completa (check-in a check-out) sin intervención manual fuera de lo que el diseño ya prevé.
 
-## Fase 5 — Enlace del huésped
+## Fase 5 — Enlace del huésped ✅ Hecha
 
-**Avance:** hechas de la 5.1 a la 5.15. La 5.6 y la 5.7 quedan cubiertas por la guía del huésped (5.9-5.15). Falta la prueba del enlace en un chat real de Airbnb para cerrar la fase.
+Cambios respecto al plan: la 5.6 y la 5.7 (vistas del huésped) empezaron como una versión provisional y, tras verla, el host las definió como una guía completa del piso que edita desde su propia pantalla: se añadieron las tareas 5.9 a la 5.15 ([Guía del huésped](#guía-del-huésped-contenido-de-la-56-y-la-57)). Probado en la réplica (enlace 33/33, guía 38/38, sin regresiones en la prueba general) y revisado por el host desde un enlace real en producción; quedan pequeñas mejoras de frontend, en [Pendientes](#pendientes).
 
-**Para activarla en producción**, en este orden:
+**En producción desde el 25 de septiembre de 2026**, activada en este orden (el mismo que hace falta si se repite en otro entorno):
 1. `npm run db:migrate` (migraciones `0006` y `0007`) **antes** de desplegar: el código nuevo lee las columnas de la guía.
-2. `npm run cargar:bosque`: borra los pisos de prueba con sus reservas y crea Bosque apartment.
-3. En Vercel, Storage → crear un Blob store **público** y conectarlo al proyecto (crea `BLOB_READ_WRITE_TOKEN`); sin él, todo funciona salvo subir fotos.
-4. Desplegar, y añadir `{enlace}` a la Bienvenida ya guardada en `/mensajes`.
+2. `npm run cargar:bosque`: borró los 3 pisos de prueba con sus 8 reservas y creó Bosque apartment con 8 tareas de preparación y 14 lugares cercanos.
+3. Push a `main` (despliegue en Vercel).
+4. En Vercel, Storage → Blob store **público** conectado al proyecto, marcando "Add a read-write token env var" (crea `BLOB_READ_WRITE_TOKEN`; el prefijo se deja en `BLOB`), y Redeploy. Sin ese token todo funciona salvo subir fotos.
 
 El enlace usa `APP_URL` si está definida y, si no, el dominio de producción que da Vercel.
 
@@ -213,9 +215,28 @@ Definido por el host después de ver las vistas provisionales: la página del hu
 | 5.14 | Vista del huésped con la guía completa y agradecimiento llamativo | — |
 | 5.15 | Script de carga: borra los pisos de prueba y crea Bosque apartment | — |
 
-**Antes de empezar:** mandar un enlace de prueba en una conversación real de Airbnb para confirmar que el chat no lo oculta ni lo marca.
-
 **Hecho cuando:** el huésped abre el enlace de su bienvenida y ve su estancia sin iniciar sesión; desde su hora de salida, el mismo enlace solo le agradece e invita a la reseña; el siguiente huésped del mismo piso recibe otro enlace; y al regenerar, el enlace anterior deja de funcionar al instante.
+
+## Pendientes
+
+Lo que queda abierto después de la Fase 5, sin fase asignada todavía.
+
+**Mejoras de frontend de la guía del huésped**
+- Pequeños ajustes visuales que el host irá definiendo tras revisarla en producción.
+
+**Hallazgos de la prueba end-to-end** (informe del 24 de septiembre de 2026)
+- **Login con un email no autorizado** (importancia media): muestra el error genérico de Next ("This page couldn't load") en vez de "Este email no tiene acceso". `signIn` lanza `AuthError` (`AccessDenied`) sin capturar en `src/app/login/page.tsx`. Arreglo: capturar el `AuthError` y redirigir a `/login/error?error=<tipo>`, dejando pasar el redirect de éxito.
+- **Doble punto en el email-resumen** (baja): "Toca desde el viernes, 25 de septiembre, 10:00 a. m..", en la línea "Toca desde…" de `src/domain/messaging/digest.ts`. Arreglo: no añadir el punto si la hora ya acaba en punto, con un caso en `digest.test.ts`.
+- **Firma de QStash inválida → 500 en vez de 403** (informativo): el despacho no se ejecuta; solo ensucia los logs. Opcional: capturar `SignatureError` y responder 403.
+
+**Datos y comprobaciones**
+- Sustituir los datos de ejemplo de Bosque apartment (wifi, TV, código de acceso, normas, basura) por los reales desde "Guía".
+- Comprobar que el chat de Airbnb deja pasar el enlace de la bienvenida sin ocultarlo ni marcarlo.
+- Confirmar que la Bienvenida guardada en `/mensajes` lleva `{enlace}` (la plantilla que ya existía no cambia sola).
+- `/estado`: la lista de fases (`src/app/(host)/estado/page.tsx`) aún muestra la Fase 4 "En curso" y no incluye la Fase 5.
+
+**Fuera de plan desde la Fase 1**
+- Importar reservas desde el calendario iCal de Airbnb.
 
 ## Frontend
 
@@ -242,6 +263,19 @@ Todo el frontend se rehízo tomando como referencia la estética, las animacione
 - **Preferencias del host**: en la cabecera, la bombilla cambia entre claro y oscuro, y el destello apaga o enciende las animaciones. Se guardan en el navegador y se aplican antes de pintar, sin parpadeo. También se respeta "reducir movimiento" del sistema.
 - **Dónde vive**: todo el estilo en `src/app/globals.css`; las piezas compartidas en `src/app/_components/` (`wordmark`, `preferences`, `hand-note`, `entry`, `icons`, `nav-link`, `field`, `submit-button`).
 - **Comprobado**: todas las pantallas en claro y oscuro, en móvil y escritorio, sin scroll horizontal a 320 y 360 px.
+
+### Guía del huésped (Fase 5)
+
+La página pública del huésped usa el mismo sistema de diseño que el área del host, con piezas propias:
+
+- **Cabecera colgante** con el nombre del piso como logo (letras que saltan) y la bombilla y el destello del tema, sin la navegación del host.
+- **Arriba**: título con el nombre del huésped enmarcado, isla de cifras (llegada, salida, noches, huéspedes) y la portada con marco en degradado, al lado en escritorio y debajo en móvil.
+- **Atajos** a cada sección con las mismas teclas de la navegación; solo aparecen las secciones con datos.
+- **Secciones**: galería deslizable, tecla grande del wifi con "Copiar clave", mapa de OpenStreetMap enmarcado, normas en recorrido de círculos, lo que hay en el apartamento como etiquetas, lugares cercanos en tarjetas por tipo con "Cómo llegar", "Antes de irte" en tarjeta amarilla y emergencias con "Llamar al 123".
+- **Agradecimiento**: estrellas amarillas que caen una a una, la portada como polaroid inclinada y los pasos para la reseña en recorrido, con el botón inclinado a Airbnb.
+- **Cabecera del host con cinco teclas** (se añadió "Guía"): en móvil las teclas encogen su relleno y su letra para caber a 320 px.
+- **Dónde vive**: las vistas en `src/app/estancia/` (`guest-guide`, `guest-thanks`, `copy-button`); el editor en `src/app/(host)/guia/`; los estilos en `globals.css`, secciones "Guía del huésped" y "Editor de la guía".
+- **Comprobado**: guía y agradecimiento en claro y oscuro, a 320, 390 y 1280 px, sin scroll horizontal; la cabecera del host a 320, 360 y 390 px.
 
 ### Vistas
 
